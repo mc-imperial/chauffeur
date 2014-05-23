@@ -6,18 +6,22 @@
 #ifndef DRIVERINFO_H
 #define DRIVERINFO_H
 
-#include <string>
+#include <list>
 #include <map>
+#include <string>
 
 namespace chauffeur
 {
-  using std::string;
+  using std::list;
   using std::map;
+  using std::string;
 
 	class DriverInfo
 	{
 	private:
-		map<string, map<string, string> > entry_points;
+    string init_function;
+    list<string> entry_points;
+		map<string, map<string, string> > entry_point_pairs;
 
 		DriverInfo() {}
 		DriverInfo(DriverInfo const&);
@@ -31,6 +35,10 @@ namespace chauffeur
     }
 
 		void AddEntryPoint(string type, string funcname, string entrypoint);
+
+    string GetInitFunction();
+
+    list<string> GetEntryPoints();
 
 		bool ExistsEntryPointWithName(string name);
 

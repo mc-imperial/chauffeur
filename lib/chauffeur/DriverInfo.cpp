@@ -12,25 +12,35 @@ namespace chauffeur
 
 	void DriverInfo::AddEntryPoint(string type, string funcname, string entrypoint)
 	{
-		entry_points[type][funcname] = entrypoint;
+		if (funcname == "probe")
+			init_function = entrypoint;
+		else
+		  entry_points.push_back(entrypoint);
+
+		entry_point_pairs[type][funcname] = entrypoint;
+	}
+
+	string DriverInfo::GetInitFunction()
+	{
+		return init_function;
+	}
+
+	list<string> DriverInfo::GetEntryPoints()
+	{
+		return entry_points;
 	}
 
 	bool DriverInfo::ExistsEntryPointWithName(string name)
 	{
 		bool exists = false;
 
-		for(map<string, map<string, string> >::iterator i = entry_points.begin(); i != entry_points.end(); i++)
+		for (list<string>::iterator i = entry_points.begin(); i != entry_points.end(); ++i)
 		{
-			for(map<string, string>::iterator j = i->second.begin(); j != i->second.end(); j++)
+			if (name == *i)
 			{
-				if (name == j->second)
-				{
-					exists = true;
-					break;
-				}
+				exists = true;
+				break;
 			}
-
-			if (exists) break;
 		}
 
 		return exists;
@@ -55,7 +65,7 @@ namespace chauffeur
 
 		string output = "";
 
-		for(map<string, map<string, string> >::iterator i = entry_points.begin(); i != entry_points.end(); i++)
+		for(map<string, map<string, string> >::iterator i = entry_point_pairs.begin(); i != entry_point_pairs.end(); i++)
 		{
 			output.append("<" + i->first + ">\n");
 

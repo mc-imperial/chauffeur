@@ -15,65 +15,139 @@ namespace chauffeur
     string fdFileWithExt = Context->getSourceManager().getFilename(FD->getLocation());
     string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
 
+    RemoveStatic(FD, fdFile);
+    RefactorFuncWithoutNetDeviceParam(FD, fdFile);
+    InstrumentInitWithEntryPointCalls(FD, fdFile);
+
+    return true;
+  }
+
+  void RewriteVisitor::RemoveStatic(FunctionDecl* FD, string fdFile)
+  {
     if (DI->getInstance().ExistsEntryPointWithName(FD->getNameInfo().getName().getAsString()))
     {
       if (FD->getStorageClass() == SC_Static)
-      {
         RW.RemoveText(FD->getInnerLocStart(), 7);
-      }
     }
     else if ((fdFile.size() > 0) && (FileName.find(fdFile) != string::npos))
     {
       if (FD->getStorageClass() == SC_Static)
         RW.ReplaceText(FD->getInnerLocStart(), 6, "static inline");
     }
+  }
 
-    if ((fdFile.size() > 0) && (FileName.find(fdFile) != string::npos))
+  void RewriteVisitor::RefactorFuncWithoutNetDeviceParam(FunctionDecl* FD, string fdFile)
+  {
+    if (fdFile.size() == 0)
+      return;
+    if (FileName.find(fdFile) == string::npos)
+      return;
+    if (FD->getNumParams() != 1)
+      return;
+    if (FD->getParamDecl(0)->getOriginalType().getAsString() != "struct device *")
+      return;
+
+    SourceRange sr = FD->getParamDecl(0)->getSourceRange();
+
+    RW.InsertTextBefore(sr.getBegin(), "struct net_device *dev, ");
+
+    Stmt *body = FD->getBody();
+    std::list<DeclStmt*> stmtsToRewrite;
+
+    for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
     {
-      if (FD->getNumParams() == 1 &&
-        FD->getParamDecl(0)->getOriginalType().getAsString() == "struct device *")
+      if (!isa<DeclStmt>(*i))
+        continue;
+
+      DeclStmt *declStmt = cast<DeclStmt>(*i);
+      if (!declStmt->isSingleDecl() && !isa<VarDecl>(declStmt->getSingleDecl()))
+        continue;
+
+      VarDecl *var = cast<VarDecl>(declStmt->getSingleDecl());
+      if (!var->hasInit())
+        continue;
+
+      Expr *expr = var->getInit();
+      if (!isa<ImplicitCastExpr>(expr))
+        continue;
+
+      ImplicitCastExpr *implicit = cast<ImplicitCastExpr>(expr);
+      if (!isa<CallExpr>(implicit->getSubExpr()))
+       continue;
+
+      CallExpr *call = cast<CallExpr>(implicit->getSubExpr());
+      DeclRefExpr *callee = cast<DeclRefExpr>(cast<ImplicitCastExpr>(call->getCallee())->getSubExpr());
+
+      if (callee->getNameInfo().getName().getAsString() == "to_pci_dev" ||
+          callee->getNameInfo().getName().getAsString() == "pci_get_drvdata")
       {
-        SourceRange sr = FD->getParamDecl(0)->getSourceRange();
-
-        RW.InsertTextBefore(sr.getBegin(), "struct net_device *dev, ");
-
-        Stmt *body = FD->getBody();
-        for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
-        {
-          if (!isa<DeclStmt>(i->IgnoreImplicit()))
-            continue;
-
-          DeclStmt *declStmt = cast<DeclStmt>(i->IgnoreImplicit());
-          if (!declStmt->isSingleDecl() && !isa<VarDecl>(declStmt->getSingleDecl()))
-            continue;
-
-          VarDecl *var = cast<VarDecl>(declStmt->getSingleDecl());
-          if (!var->hasInit())
-            continue;
-
-          Expr *expr = var->getInit();
-          if (!isa<ImplicitCastExpr>(expr))
-            continue;
-
-          ImplicitCastExpr *implicit = cast<ImplicitCastExpr>(expr);
-          if (!isa<CallExpr>(implicit->getSubExpr()))
-           continue;
-
-          CallExpr *call = cast<CallExpr>(implicit->getSubExpr());
-          DeclRefExpr *callee = cast<DeclRefExpr>(cast<ImplicitCastExpr>(call->getCallee()));
-
-          // DRE->getNameInfo().getName().getAsString()
-
-          call->dump();
-          llvm::errs() << "decl: " << "true" << "\n";
-        }
+        stmtsToRewrite.push_back(declStmt);
       }
     }
 
-    return true;
+    while (!stmtsToRewrite.empty())
+    {
+      DeclStmt *stmt = stmtsToRewrite.back();
+      RW.RemoveText(stmt->getSourceRange(), *RWO);
+      stmtsToRewrite.pop_back();
+    }
   }
 
-  void RewriteVisitor::Finalise() {
+  void RewriteVisitor::InstrumentInitWithEntryPointCalls(FunctionDecl* FD, string fdFile)
+  {
+    if (FD->getNameInfo().getName().getAsString() != DI->getInstance().GetInitFunction())
+      return;
+
+    string net_device_str;
+    Stmt *body = FD->getBody();
+
+    for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
+    {
+      if (!isa<DeclStmt>(*i))
+        continue;
+
+      DeclStmt *declStmt = cast<DeclStmt>(*i);
+      if (!declStmt->isSingleDecl() && !isa<VarDecl>(declStmt->getSingleDecl()))
+        continue;
+
+      VarDecl *var = cast<VarDecl>(declStmt->getSingleDecl());
+      if (!isa<ValueDecl>(var))
+        continue;
+
+      ValueDecl *value = cast<ValueDecl>(var);
+
+      if (value->getType().getAsString(Context->getPrintingPolicy()) != "struct net_device *")
+        continue;
+      if (!isa<NamedDecl>(var))
+        continue;
+
+      NamedDecl *named = cast<NamedDecl>(var);
+      net_device_str = named->getNameAsString();
+      break;
+    }
+
+    if (net_device_str.empty())
+      return;
+
+    for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
+    {
+      if (!isa<LabelStmt>(*i))
+        continue;
+
+      LabelStmt *labelStmt = cast<LabelStmt>(*i);
+
+      RW.InsertTextBefore(labelStmt->getIdentLoc(), "\n");
+
+      list<string> entry_points = DI->getInstance().GetEntryPoints();
+      for (list<string>::reverse_iterator i = entry_points.rbegin(); i != entry_points.rend(); ++i)
+      {
+        RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *i + "(" + net_device_str + ");\n");
+      }
+    }
+  }
+  
+  void RewriteVisitor::Finalise()
+  {
     string file = FileName;
     file.append(".re.c");
 
