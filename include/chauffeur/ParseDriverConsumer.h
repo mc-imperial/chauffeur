@@ -7,7 +7,8 @@
 #define PARSEDRIVERCONSUMER_H
 
 #include "chauffeur/FindEntryPointsVisitor.h"
-#include "chauffeur/RewriteVisitor.h"
+#include "chauffeur/TestDriverRewriteVisitor.h"
+#include "chauffeur/NetworkDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTConsumer.h"
 
@@ -17,12 +18,16 @@ namespace chauffeur
 
 	class ParseDriverConsumer : public ASTConsumer {
 	private:
+    DriverInfo *DI;
 	  FindEntryPointsVisitor *FEPV;
-		RewriteVisitor *RV;
+    TestDriverRewriteVisitor *TDRV;
+		NetworkDriverRewriteVisitor *NDRV;
 
 	public:
 	  explicit ParseDriverConsumer(CompilerInstance *CI)
-	    : FEPV(new FindEntryPointsVisitor(CI)), RV(new RewriteVisitor(CI))
+	    : FEPV(new FindEntryPointsVisitor(CI)),
+        TDRV(new TestDriverRewriteVisitor(CI)),
+        NDRV(new NetworkDriverRewriteVisitor(CI))
 		{}
 
 	  virtual void HandleTranslationUnit(ASTContext &Context);

@@ -3,6 +3,7 @@
 // This file is distributed under the MIT License. See LICENSE for details.
 //
 
+#include "chauffeur/DriverType.h"
 #include "chauffeur/ParseDriverConsumer.h"
 
 namespace chauffeur
@@ -11,7 +12,16 @@ namespace chauffeur
   {
     FEPV->TraverseDecl(Context.getTranslationUnitDecl());
     FEPV->PrintEntryPoints();
-    RV->TraverseDecl(Context.getTranslationUnitDecl());
-    RV->Finalise();
+
+    if (DI->getInstance().GetType() == TEST_DRIVER)
+    {
+      TDRV->TraverseDecl(Context.getTranslationUnitDecl());
+      TDRV->Finalise();
+    }
+    else if (DI->getInstance().GetType() == NETWORK_DRIVER)
+    {
+      NDRV->TraverseDecl(Context.getTranslationUnitDecl());
+      NDRV->Finalise();
+    }
   }
 }

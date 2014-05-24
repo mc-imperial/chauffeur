@@ -10,6 +10,11 @@ namespace chauffeur
 {
 	std::string FileName;
 
+	void DriverInfo::SetType(DriverType type)
+	{
+		driver_type = type;
+	}
+
   void DriverInfo::SetInitFunction(string entrypoint)
 	{
 		init_function = entrypoint;
@@ -23,6 +28,11 @@ namespace chauffeur
 	void DriverInfo::AddEntryPointPair(string type, string funcname, string entrypoint)
 	{
 		entry_point_pairs[type][funcname] = entrypoint;
+	}
+
+	DriverType DriverInfo::GetType()
+	{
+		return driver_type;
 	}
 
 	string DriverInfo::GetInitFunction()

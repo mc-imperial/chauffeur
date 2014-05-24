@@ -4,6 +4,7 @@
 //
 
 #include "chauffeur/Chauffeur.h"
+#include "chauffeur/DriverType.h"
 #include "chauffeur/FindEntryPointsVisitor.h"
 #include "clang/AST/ASTContext.h"
 
@@ -25,6 +26,11 @@ namespace chauffeur
     {
       return true;
     }
+
+    if (baseRecDecl->getNameAsString() == "test_driver")
+      DI->getInstance().SetType(TEST_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "net_device_ops")
+      DI->getInstance().SetType(NETWORK_DRIVER);
 
     InitListExpr *initExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
 

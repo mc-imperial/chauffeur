@@ -84,7 +84,8 @@ add_executable(chauffeur
   tools/chauffeur.cpp
   lib/chauffeur/ParseDriverConsumer.cpp
   lib/chauffeur/FindEntryPointsVisitor.cpp
-  lib/chauffeur/RewriteVisitor.cpp
+  lib/chauffeur/TestDriverRewriteVisitor.cpp
+  lib/chauffeur/NetworkDriverRewriteVisitor.cpp
   lib/chauffeur/DriverInfo.cpp)
 
 target_link_libraries(chauffeur ${CLANG_LIBS})

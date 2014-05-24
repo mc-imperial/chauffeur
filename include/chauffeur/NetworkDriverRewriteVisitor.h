@@ -3,8 +3,8 @@
 // This file is distributed under the MIT License. See LICENSE for details.
 //
 
-#ifndef REWRITEVISITOR_H
-#define REWRITEVISITOR_H
+#ifndef NETWORKDRIVERREWRITEVISITOR_H
+#define NETWORKDRIVERREWRITEVISITOR_H
 
 #include "chauffeur/DriverInfo.h"
 #include "clang/AST/ASTContext.h"
@@ -17,7 +17,7 @@ namespace chauffeur
 {
   using namespace clang;
 
-	class RewriteVisitor : public RecursiveASTVisitor<RewriteVisitor>
+	class NetworkDriverRewriteVisitor : public RecursiveASTVisitor<NetworkDriverRewriteVisitor>
 	{
 	private:
 		ASTContext *Context;
@@ -29,7 +29,7 @@ namespace chauffeur
     void InstrumentInitWithEntryPointCalls(FunctionDecl* FD, string fdFile);
 
 	public:
-	  explicit RewriteVisitor(CompilerInstance *CI)
+	  explicit NetworkDriverRewriteVisitor(CompilerInstance *CI)
       : Context(&(CI->getASTContext()))
     {
       RW.setSourceMgr(Context->getSourceManager(), Context->getLangOpts());
@@ -41,4 +41,4 @@ namespace chauffeur
 	};
 }
 
-#endif // REWRITEVISITOR_H
+#endif // NETWORKDRIVERREWRITEVISITOR_H

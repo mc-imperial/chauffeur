@@ -6,6 +6,7 @@
 #ifndef DRIVERINFO_H
 #define DRIVERINFO_H
 
+#include "chauffeur/DriverType.h"
 #include "clang/AST/ASTContext.h"
 
 namespace chauffeur
@@ -19,6 +20,7 @@ namespace chauffeur
     string init_function;
 		map<string, list<string> > entry_points;
     map<string, map<string, string> > entry_point_pairs;
+    DriverType driver_type;
 
 		DriverInfo() {}
 		DriverInfo(DriverInfo const&);
@@ -31,11 +33,15 @@ namespace chauffeur
       return instance;
     }
 
+    void SetType(DriverType type);
+
     void SetInitFunction(string entrypoint);
 
     void AddEntryPoint(string entrypoint, list<string> params);
 
 		void AddEntryPointPair(string type, string funcname, string entrypoint);
+
+    DriverType GetType();
 
     string GetInitFunction();
 
