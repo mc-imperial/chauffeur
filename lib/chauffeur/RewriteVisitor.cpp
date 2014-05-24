@@ -15,36 +15,38 @@ namespace chauffeur
     string fdFileWithExt = Context->getSourceManager().getFilename(FD->getLocation());
     string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
 
-    RemoveStatic(FD, fdFile);
-    RefactorFuncWithoutNetDeviceParam(FD, fdFile);
+    InlineFunctions(FD, fdFile);
+    InstrumentEntryPoints(FD, fdFile);
     InstrumentInitWithEntryPointCalls(FD, fdFile);
 
     return true;
   }
 
-  void RewriteVisitor::RemoveStatic(FunctionDecl* FD, string fdFile)
+  void RewriteVisitor::InlineFunctions(FunctionDecl* FD, string fdFile)
   {
     if (DI->getInstance().ExistsEntryPointWithName(FD->getNameInfo().getName().getAsString()))
-    {
-      if (FD->getStorageClass() == SC_Static)
-        RW.RemoveText(FD->getInnerLocStart(), 7);
-    }
-    else if ((fdFile.size() > 0) && (FileName.find(fdFile) != string::npos))
+      return;
+
+    if ((fdFile.size() > 0) && (fdFile.find(FileName) != string::npos))
     {
       if (FD->getStorageClass() == SC_Static)
         RW.ReplaceText(FD->getInnerLocStart(), 6, "static inline");
     }
   }
 
-  void RewriteVisitor::RefactorFuncWithoutNetDeviceParam(FunctionDecl* FD, string fdFile)
+  void RewriteVisitor::InstrumentEntryPoints(FunctionDecl* FD, string fdFile)
   {
-    if (fdFile.size() == 0)
+    if (!(DI->getInstance().ExistsEntryPointWithName(FD->getNameInfo().getName().getAsString())))
       return;
-    if (FileName.find(fdFile) == string::npos)
+
+    if (FD->getStorageClass() == SC_Static)
+      RW.RemoveText(FD->getInnerLocStart(), 7);
+
+    if (DI->getInstance().GetInitFunction() == FD->getNameInfo().getName().getAsString())
       return;
-    if (FD->getNumParams() != 1)
-      return;
-    if (FD->getParamDecl(0)->getOriginalType().getAsString() != "struct device *")
+
+    if (FD->getParamDecl(0)->getOriginalType().getAsString() != "struct device *" &&
+        FD->getParamDecl(0)->getOriginalType().getAsString() != "struct pci_dev *")
       return;
 
     SourceRange sr = FD->getParamDecl(0)->getSourceRange();
@@ -52,9 +54,9 @@ namespace chauffeur
     RW.InsertTextBefore(sr.getBegin(), "struct net_device *dev, ");
 
     Stmt *body = FD->getBody();
-    std::list<DeclStmt*> stmtsToRewrite;
+    list<DeclStmt*> stmtsToRewrite;
 
-    for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
+    for (auto i = body->child_begin(), e = body->child_end(); i != e; ++i)
     {
       if (!isa<DeclStmt>(*i))
         continue;
@@ -88,7 +90,7 @@ namespace chauffeur
     while (!stmtsToRewrite.empty())
     {
       DeclStmt *stmt = stmtsToRewrite.back();
-      RW.RemoveText(stmt->getSourceRange(), *RWO);
+      RW.RemoveText(stmt->getSourceRange());
       stmtsToRewrite.pop_back();
     }
   }
@@ -101,7 +103,7 @@ namespace chauffeur
     string net_device_str;
     Stmt *body = FD->getBody();
 
-    for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
+    for (auto i = body->child_begin(), e = body->child_end(); i != e; ++i)
     {
       if (!isa<DeclStmt>(*i))
         continue;
@@ -129,7 +131,17 @@ namespace chauffeur
     if (net_device_str.empty())
       return;
 
-    for (StmtIterator i = body->child_begin(), e = body->child_end(); i != e; ++i)
+    map<string, string> func_params;
+    // list<ParmVarDecl*> func_params;
+    for (auto i = FD->param_begin(), e = FD->param_end(); i != e; ++i)
+    {
+      ValueDecl *paramVal = cast<ValueDecl>(*i);
+      NamedDecl *paramNam = cast<NamedDecl>(*i);
+
+      func_params[paramVal->getType().getAsString(Context->getPrintingPolicy())] = paramNam->getNameAsString();
+    }
+
+    for (auto i = body->child_begin(), e = body->child_end(); i != e; ++i)
     {
       if (!isa<LabelStmt>(*i))
         continue;
@@ -138,21 +150,126 @@ namespace chauffeur
 
       RW.InsertTextBefore(labelStmt->getIdentLoc(), "\n");
 
-      list<string> entry_points = DI->getInstance().GetEntryPoints();
-      for (list<string>::reverse_iterator i = entry_points.rbegin(); i != entry_points.rend(); ++i)
+      auto entry_points = DI->getInstance().GetEntryPoints();
+      for(auto i = entry_points.begin(); i != entry_points.end(); i++)
       {
-        RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *i + "(" + net_device_str + ");\n");
+        string entry_point_call = "	" + i->first + "(";
+        if (find(i->second.begin(), i->second.end(), "struct net_device *") == i->second.end())
+          entry_point_call += net_device_str + ", ";
+
+        for(auto j = i->second.begin(); j != i->second.end(); j++)
+        {
+          if (*j == "struct net_device *")
+            entry_point_call += net_device_str + ", ";
+          else if (*j == "struct pci_dev *")
+            entry_point_call += func_params["struct pci_dev *"] + ", ";
+          else if (*j == "struct device *")
+            entry_point_call += "&" + func_params["struct pci_dev *"] + "->dev, ";
+          else if (*j == "void *")
+            entry_point_call += "NULL, ";
+          else if (*j == "u64 *")
+            entry_point_call += "NULL, ";
+          else if (*j == "u8 *")
+            entry_point_call += "NULL, ";
+          else if (*j == "struct sk_buff *")
+            entry_point_call += "whoop_skb, ";
+          else if (*j == "struct ethtool_wolinfo *")
+            entry_point_call += "whoop_wolinfo, ";
+          else if (*j == "struct ethtool_cmd *")
+            entry_point_call += "whoop_ecmd, ";
+          else if (*j == "struct ifreq *")
+            entry_point_call += "whoop_ifreq, ";
+          else if (*j == "struct rtnl_link_stats64 *")
+            entry_point_call += "whoop_rtnlsts64, ";
+          else if (*j == "struct ethtool_regs *")
+            entry_point_call += "whoop_ethtoolregs, ";
+          else if (*j == "struct ethtool_stats *")
+            entry_point_call += "whoop_ethtoolsts, ";
+          else if (*j == "struct ethtool_drvinfo *")
+            entry_point_call += "whoop_ethtooldrvinfo, ";
+          else if (*j == "netdev_features_t")
+            entry_point_call += "whoop_netdevfeat, ";
+          else if (*j == "int")
+            entry_point_call += "0, ";
+          else if (*j == "u32")
+            entry_point_call += "0, ";
+          else
+            entry_point_call += *j + ", ";
+        }
+
+        entry_point_call.resize(entry_point_call.size() - 2);
+        RW.InsertTextBefore(labelStmt->getIdentLoc(), entry_point_call + ");\n");
       }
+
+      RW.InsertTextBefore(labelStmt->getIdentLoc(), "\n");
+
+      list<string> instrDone;
+      for(auto i = entry_points.begin(); i != entry_points.end(); i++)
+      {
+        for(auto j = i->second.begin(); j != i->second.end(); j++)
+        {
+          if (find(instrDone.begin(), instrDone.end(), *j) != instrDone.end())
+            continue;
+
+          if (*j == "struct sk_buff *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_skb;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct ethtool_wolinfo *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_wolinfo;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct ethtool_cmd *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_ecmd;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct ifreq *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_ifreq;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct rtnl_link_stats64 *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_rtnlsts64;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct ethtool_regs *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_ethtoolregs;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct ethtool_stats *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_ethtoolsts;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "struct ethtool_drvinfo *")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_ethtooldrvinfo;\n");
+            instrDone.push_back(*j);
+          }
+          else if (*j == "netdev_features_t")
+          {
+            RW.InsertTextBefore(labelStmt->getIdentLoc(), "	" + *j + " whoop_netdevfeat = NETIF_F_RXCSUM;\n");
+            instrDone.push_back(*j);
+          }
+        }
+      }
+
+      break;
     }
   }
-  
+
   void RewriteVisitor::Finalise()
   {
     string file = FileName;
     file.append(".re.c");
 
     string error_msg;
-    llvm::raw_fd_ostream *FOS = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
+    llvm::raw_fd_ostream *fos = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
     if (!error_msg.empty())
     {
       if (llvm::errs().has_colors()) llvm::errs().changeColor(llvm::raw_ostream::RED);
@@ -161,10 +278,10 @@ namespace chauffeur
       exit(1);
     }
 
-    FOS->SetUnbuffered();
-    FOS->SetUseAtomicWrites(true);
+    fos->SetUnbuffered();
+    fos->SetUseAtomicWrites(true);
 
-    raw_ostream *ros = FOS;
+    raw_ostream *ros = fos;
 
     RW.getEditBuffer(RW.getSourceMgr().getMainFileID()).write(*ros);
   }

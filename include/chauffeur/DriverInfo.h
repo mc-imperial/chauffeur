@@ -6,22 +6,19 @@
 #ifndef DRIVERINFO_H
 #define DRIVERINFO_H
 
-#include <list>
-#include <map>
-#include <string>
+#include "clang/AST/ASTContext.h"
 
 namespace chauffeur
 {
-  using std::list;
-  using std::map;
-  using std::string;
+  using namespace clang;
+  using namespace std;
 
 	class DriverInfo
 	{
 	private:
     string init_function;
-    list<string> entry_points;
-		map<string, map<string, string> > entry_point_pairs;
+		map<string, list<string> > entry_points;
+    map<string, map<string, string> > entry_point_pairs;
 
 		DriverInfo() {}
 		DriverInfo(DriverInfo const&);
@@ -34,11 +31,15 @@ namespace chauffeur
       return instance;
     }
 
-		void AddEntryPoint(string type, string funcname, string entrypoint);
+    void SetInitFunction(string entrypoint);
+
+    void AddEntryPoint(string entrypoint, list<string> params);
+
+		void AddEntryPointPair(string type, string funcname, string entrypoint);
 
     string GetInitFunction();
 
-    list<string> GetEntryPoints();
+    map<string, list<string> > GetEntryPoints();
 
 		bool ExistsEntryPointWithName(string name);
 

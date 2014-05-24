@@ -10,13 +10,18 @@ namespace chauffeur
 {
 	std::string FileName;
 
-	void DriverInfo::AddEntryPoint(string type, string funcname, string entrypoint)
+  void DriverInfo::SetInitFunction(string entrypoint)
 	{
-		if (funcname == "probe")
-			init_function = entrypoint;
-		else
-		  entry_points.push_back(entrypoint);
+		init_function = entrypoint;
+	}
 
+	void DriverInfo::AddEntryPoint(string entrypoint, list<string> params)
+	{
+		entry_points[entrypoint] = params;
+	}
+
+	void DriverInfo::AddEntryPointPair(string type, string funcname, string entrypoint)
+	{
 		entry_point_pairs[type][funcname] = entrypoint;
 	}
 
@@ -25,7 +30,7 @@ namespace chauffeur
 		return init_function;
 	}
 
-	list<string> DriverInfo::GetEntryPoints()
+	map<string, list<string> > DriverInfo::GetEntryPoints()
 	{
 		return entry_points;
 	}
@@ -34,14 +39,17 @@ namespace chauffeur
 	{
 		bool exists = false;
 
-		for (list<string>::iterator i = entry_points.begin(); i != entry_points.end(); ++i)
+		for(auto i = entry_points.begin(); i != entry_points.end(); i++)
 		{
-			if (name == *i)
+			if (name == i->first)
 			{
 				exists = true;
 				break;
 			}
 		}
+
+		if (name == init_function)
+		  exists = true;
 
 		return exists;
 	}
@@ -51,7 +59,7 @@ namespace chauffeur
 		string file = FileName;
 		file.append(".info");
 		string error_msg;
-		llvm::raw_fd_ostream *FOS = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
+		llvm::raw_fd_ostream *fos = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
 		if (!error_msg.empty())
 		{
 			if (llvm::errs().has_colors()) llvm::errs().changeColor(llvm::raw_ostream::RED);
@@ -60,16 +68,16 @@ namespace chauffeur
 			exit(1);
 		}
 
-		FOS->SetUnbuffered();
-		FOS->SetUseAtomicWrites(true);
+		fos->SetUnbuffered();
+		fos->SetUseAtomicWrites(true);
 
 		string output = "";
 
-		for(map<string, map<string, string> >::iterator i = entry_point_pairs.begin(); i != entry_point_pairs.end(); i++)
+		for(auto i = entry_point_pairs.begin(); i != entry_point_pairs.end(); i++)
 		{
 			output.append("<" + i->first + ">\n");
 
-			for(map<string, string>::iterator j = i->second.begin(); j != i->second.end(); j++)
+			for(auto j = i->second.begin(); j != i->second.end(); j++)
 			{
 				output.append(j->first + "::" +j->second + "\n");
 			}
@@ -77,7 +85,7 @@ namespace chauffeur
 			output.append("</>\n");
 		}
 
-		llvm::raw_ostream *ros = FOS;
+		llvm::raw_ostream *ros = fos;
 
 		ros->write(output.data(), output.size());
 	}

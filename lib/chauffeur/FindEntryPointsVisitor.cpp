@@ -11,94 +11,116 @@ namespace chauffeur
 {
   using namespace std;
 
-  bool FindEntryPointsVisitor::VisitVarDecl(VarDecl* VD)
+  bool FindEntryPointsVisitor::VisitVarDecl(VarDecl* varDecl)
   {
-    if (!VD->getType()->isRecordType()) return true;
+    if (!varDecl->getType()->isRecordType()) return true;
 
-    RecordDecl *BaseRD = VD->getType()->getAs<RecordType>()->getDecl();
+    RecordDecl *baseRecDecl = varDecl->getType()->getAs<RecordType>()->getDecl();
 
-    if (!(BaseRD->getNameAsString() == "pci_driver" ||
-        BaseRD->getNameAsString() == "dev_pm_ops" ||
-        BaseRD->getNameAsString() == "net_device_ops" ||
-        BaseRD->getNameAsString() == "ethtool_ops" ||
-        BaseRD->getNameAsString() == "test_driver"))
+    if (!(baseRecDecl->getNameAsString() == "pci_driver" ||
+        baseRecDecl->getNameAsString() == "dev_pm_ops" ||
+        baseRecDecl->getNameAsString() == "net_device_ops" ||
+        baseRecDecl->getNameAsString() == "ethtool_ops" ||
+        baseRecDecl->getNameAsString() == "test_driver"))
     {
       return true;
     }
 
-    InitListExpr *ILE = cast<InitListExpr>(VD->getInit())->getSyntacticForm();
+    InitListExpr *initExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
 
-    for (Stmt::child_range range = ILE->children(); range; ++range)
+    for (auto range = initExpr->children(); range; ++range)
     {
-      DesignatedInitExpr *DIE = cast<DesignatedInitExpr>(*range);
-      if (DIE->size() != 1) continue;
+      DesignatedInitExpr *desExpr = cast<DesignatedInitExpr>(*range);
+      if (desExpr->size() != 1) continue;
 
       string funcname;
 
       if (/* pci_driver */
-          DIE->getDesignator(0)->getFieldName()->getName() == "probe" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "remove" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "shutdown" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "probe" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "remove" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "shutdown" ||
           /* dev_pm_ops */
-          DIE->getDesignator(0)->getFieldName()->getName() == "suspend" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "resume" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "freeze" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "thaw" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "poweroff" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "restore" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "runtime_suspend" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "runtime_resume" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "runtime_idle" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "suspend" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "resume" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "freeze" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "thaw" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "poweroff" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "restore" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "runtime_suspend" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "runtime_resume" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "runtime_idle" ||
           /* net_device_ops */
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_open" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_stop" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_get_stats64" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_start_xmit" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_tx_timeout" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_validate_addr" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_change_mtu" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_fix_features" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_set_features" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_set_mac_address" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_do_ioctl" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_set_rx_mode" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ndo_poll_controller" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_open" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_stop" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_get_stats64" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_start_xmit" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_tx_timeout" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_validate_addr" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_change_mtu" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_fix_features" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_set_features" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_set_mac_address" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_do_ioctl" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_set_rx_mode" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ndo_poll_controller" ||
           /* ethtool_ops */
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_drvinfo" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_regs_len" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_link" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_settings" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "set_settings" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_msglevel" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "set_msglevel" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_regs" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_wol" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "set_wol" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_strings" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_drvinfo" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_regs_len" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_link" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_settings" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "set_settings" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_msglevel" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "set_msglevel" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_regs" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_wol" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "set_wol" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_strings" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
           /* test_driver */
-          DIE->getDesignator(0)->getFieldName()->getName() == "ep1" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ep2" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ep3" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ep4" ||
-          DIE->getDesignator(0)->getFieldName()->getName() == "ep5")
-        funcname = DIE->getDesignator(0)->getFieldName()->getName();
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ep1" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ep2" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ep3" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ep4" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ep5")
+        funcname = desExpr->getDesignator(0)->getFieldName()->getName();
       else
         continue;
 
-      Expr *expr = cast<ImplicitCastExpr>(DIE->getInit())->getSubExpr();
+      Expr *expr = cast<ImplicitCastExpr>(desExpr->getInit())->getSubExpr();
       while (!isa<DeclRefExpr>(expr))
         expr = cast<ImplicitCastExpr>(expr)->getSubExpr();
-      DeclRefExpr *DRE = cast<DeclRefExpr>(expr);
+      DeclRefExpr *declExpr = cast<DeclRefExpr>(expr);
 
-      string fdFileWithExt = Context->getSourceManager().getFilename(DRE->getDecl()->getLocation());
+      string fdFileWithExt = Context->getSourceManager().getFilename(declExpr->getDecl()->getLocation());
       string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
 
       if ((fdFile.size() > 0) && (fdFile.find(FileName) != string::npos))
       {
-        DI->getInstance().AddEntryPoint(BaseRD->getNameAsString(), funcname, DRE->getNameInfo().getName().getAsString());
+        ValueDecl *value = declExpr->getDecl();
+        if (!isa<FunctionDecl>(value))
+          continue;
+
+        if (funcname == "probe")
+        {
+          DI->getInstance().SetInitFunction(declExpr->getNameInfo().getName().getAsString());
+        }
+        else
+        {
+          list<string> func_params;
+          FunctionDecl *func = cast<FunctionDecl>(value);
+          for (auto i = func->param_begin(), e = func->param_end(); i != e; ++i)
+          {
+            ValueDecl *paramVal = cast<ValueDecl>(*i);
+            func_params.push_back(paramVal->getType().getAsString(Context->getPrintingPolicy()));
+          }
+
+          DI->getInstance().AddEntryPoint(declExpr->getNameInfo().getName().getAsString(), func_params);
+        }
+
+        DI->getInstance().AddEntryPointPair(baseRecDecl->getNameAsString(),
+          funcname, declExpr->getNameInfo().getName().getAsString());
       }
     }
 

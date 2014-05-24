@@ -22,11 +22,10 @@ namespace chauffeur
 	private:
 		ASTContext *Context;
 		Rewriter RW;
-    Rewriter::RewriteOptions *RWO;
 		DriverInfo *DI;
 
-    void RemoveStatic(FunctionDecl* FD, string fdFile);
-    void RefactorFuncWithoutNetDeviceParam(FunctionDecl* FD, string fdFile);
+    void InlineFunctions(FunctionDecl* FD, string fdFile);
+    void InstrumentEntryPoints(FunctionDecl* FD, string fdFile);
     void InstrumentInitWithEntryPointCalls(FunctionDecl* FD, string fdFile);
 
 	public:
@@ -34,8 +33,6 @@ namespace chauffeur
       : Context(&(CI->getASTContext()))
     {
       RW.setSourceMgr(Context->getSourceManager(), Context->getLangOpts());
-      RWO = new Rewriter::RewriteOptions();
-      RWO->RemoveLineIfEmpty = true;
     }
 
 		virtual bool VisitFunctionDecl(FunctionDecl* FD);
