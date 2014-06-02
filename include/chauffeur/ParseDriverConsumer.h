@@ -24,10 +24,10 @@ namespace chauffeur
 		NetworkDriverRewriteVisitor *NDRV;
 
 	public:
-	  explicit ParseDriverConsumer(CompilerInstance *CI)
+	  explicit ParseDriverConsumer(CompilerInstance *CI, bool doInline)
 	    : FEPV(new FindEntryPointsVisitor(CI)),
-        TDRV(new TestDriverRewriteVisitor(CI)),
-        NDRV(new NetworkDriverRewriteVisitor(CI))
+        TDRV(new TestDriverRewriteVisitor(CI, doInline)),
+        NDRV(new NetworkDriverRewriteVisitor(CI, doInline))
 		{}
 
 	  virtual void HandleTranslationUnit(ASTContext &Context);

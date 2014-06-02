@@ -23,15 +23,17 @@ namespace chauffeur
 		ASTContext *Context;
 		Rewriter RW;
 		DriverInfo *DI;
+    bool DoInline;
 
     void InlineFunctions(FunctionDecl* FD, string fdFile);
     void InstrumentEntryPoints(FunctionDecl* FD, string fdFile);
     void InstrumentInitWithEntryPointCalls(FunctionDecl* FD, string fdFile);
 
 	public:
-	  explicit NetworkDriverRewriteVisitor(CompilerInstance *CI)
+	  explicit NetworkDriverRewriteVisitor(CompilerInstance *CI, bool doInline)
       : Context(&(CI->getASTContext()))
     {
+      DoInline = doInline;
       RW.setSourceMgr(Context->getSourceManager(), Context->getLangOpts());
     }
 

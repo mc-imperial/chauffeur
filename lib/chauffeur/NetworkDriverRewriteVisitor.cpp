@@ -15,7 +15,9 @@ namespace chauffeur
     string fdFileWithExt = Context->getSourceManager().getFilename(FD->getLocation());
     string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
 
-    InlineFunctions(FD, fdFile);
+    if (DoInline)
+      InlineFunctions(FD, fdFile);
+    
     InstrumentEntryPoints(FD, fdFile);
     InstrumentInitWithEntryPointCalls(FD, fdFile);
 

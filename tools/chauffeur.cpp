@@ -26,6 +26,8 @@ static cl::opt<bool> ASTPrint("ast-print",
     cl::desc(Options->getOptionHelpText(options::OPT_ast_print)));
 static cl::opt<std::string> ASTDumpFilter("ast-dump-filter",
     cl::desc(Options->getOptionHelpText(options::OPT_ast_dump_filter)));
+static cl::opt<bool> ASTInline("inline",
+    cl::desc("Inline all non entry point device driver functions"));
 
 namespace chauffeur
 {
@@ -40,7 +42,9 @@ namespace chauffeur
           return clang::CreateASTDumper(ASTDumpFilter);
         if (ASTPrint)
           return clang::CreateASTPrinter(&llvm::outs(), ASTDumpFilter);
-        return new ParseDriverConsumer(&CI);
+        if (ASTInline)
+          llvm::errs() << "test" << "\n";
+        return new ParseDriverConsumer(&CI, ASTInline);
       }
   };
 }
