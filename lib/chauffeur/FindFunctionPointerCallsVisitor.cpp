@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
+// Copyright (c) 2014-2015 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
 // This file is distributed under the MIT License. See LICENSE for details.
 //
 
@@ -22,6 +22,9 @@ namespace chauffeur
       return true;
     }
 
+    // llvm::errs() << "call:" << "\n";
+    // callExpr->dumpColor();
+
     Expr *callee = callExpr->getCallee();
     if (!isa<ImplicitCastExpr>(callee))
     {
@@ -40,22 +43,32 @@ namespace chauffeur
     else if (isa<MemberExpr>(calleeImplExpr->getSubExpr()))
     {
       MemberExpr *calleeMemExpr = cast<MemberExpr>(calleeImplExpr->getSubExpr());
-      if (!isa<ImplicitCastExpr>(calleeMemExpr->getBase()))
+      MemberExpr *calleeSubMemExpr;
+      if (isa<ImplicitCastExpr>(calleeMemExpr->getBase()))
+      {
+        calleeImplExpr = cast<ImplicitCastExpr>(calleeMemExpr->getBase());
+        if (!isa<DeclRefExpr>(calleeImplExpr->getSubExpr()))
+        {
+          return true;
+        }
+
+        DeclRefExpr *calleeDeclExpr = cast<DeclRefExpr>(calleeImplExpr->getSubExpr());
+        istringstream iss(calleeDeclExpr->getDecl()->getType().getCanonicalType().getAsString());
+        vector<string> tokens{istream_iterator<string>{iss}, istream_iterator<string>{}};
+        calleeDecl = calleeMemExpr->getMemberDecl();
+        funcPointers["0"] = tokens[1] + "." + calleeDecl->getNameAsString();
+      }
+      else if (isa<MemberExpr>(calleeMemExpr->getBase()))
+      {
+        calleeSubMemExpr = cast<MemberExpr>(calleeMemExpr->getBase());
+        NamedDecl *calleeSubDecl = calleeSubMemExpr->getMemberDecl();
+        calleeDecl = calleeMemExpr->getMemberDecl();
+        funcPointers["0"] = calleeSubDecl->getNameAsString() + "." + calleeDecl->getNameAsString();
+      }
+      else
       {
         return true;
       }
-
-      calleeImplExpr = cast<ImplicitCastExpr>(calleeMemExpr->getBase());
-      if (!isa<DeclRefExpr>(calleeImplExpr->getSubExpr()))
-      {
-        return true;
-      }
-
-      DeclRefExpr *calleeDeclExpr = cast<DeclRefExpr>(calleeImplExpr->getSubExpr());
-      istringstream iss(calleeDeclExpr->getDecl()->getType().getCanonicalType().getAsString());
-      vector<string> tokens{istream_iterator<string>{iss}, istream_iterator<string>{}};
-      calleeDecl = calleeMemExpr->getMemberDecl();
-      funcPointers["0"] = tokens[1] + "." + calleeDecl->getNameAsString();
     }
     else
     {

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
+// Copyright (c) 2014-2015 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
 // This file is distributed under the MIT License. See LICENSE for details.
 //
 
@@ -120,7 +120,7 @@ namespace chauffeur
 	void DriverInfo::PrintFunctionPointerInfo()
 	{
 		string file = FileName;
-		file.append(".fp.info");
+		file.append("_fp.info");
 		string error_msg;
 		llvm::raw_fd_ostream *fos = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
 		if (!error_msg.empty())

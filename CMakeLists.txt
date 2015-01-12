@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
+# Copyright (c) 2014-2015 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
 # This file is distributed under the MIT License. See LICENSE for details.
 #
 
