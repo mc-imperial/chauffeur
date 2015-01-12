@@ -10,52 +10,52 @@ namespace chauffeur
 {
   using namespace std;
 
-  bool NetworkDriverRewriteVisitor::VisitFunctionDecl(FunctionDecl* FD)
+  bool NetworkDriverRewriteVisitor::VisitFunctionDecl(FunctionDecl* funcDecl)
   {
-    string fdFileWithExt = Context->getSourceManager().getFilename(FD->getLocation());
+    string fdFileWithExt = Context->getSourceManager().getFilename(funcDecl->getLocation());
     string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
 
     if (DoInline)
-      InlineFunctions(FD, fdFile);
-    
-    InstrumentEntryPoints(FD, fdFile);
-    InstrumentInitWithEntryPointCalls(FD, fdFile);
+      InlineFunctions(funcDecl, fdFile);
+
+    InstrumentEntryPoints(funcDecl, fdFile);
+    InstrumentInitWithEntryPointCalls(funcDecl, fdFile);
 
     return true;
   }
 
-  void NetworkDriverRewriteVisitor::InlineFunctions(FunctionDecl* FD, string fdFile)
+  void NetworkDriverRewriteVisitor::InlineFunctions(FunctionDecl* funcDecl, string fdFile)
   {
-    if (DI->getInstance().ExistsEntryPointWithName(FD->getNameInfo().getName().getAsString()))
+    if (DI->getInstance().ExistsEntryPointWithName(funcDecl->getNameInfo().getName().getAsString()))
       return;
 
     if ((fdFile.size() > 0) && (fdFile.find(FileName) != string::npos))
     {
-      if (FD->getStorageClass() == SC_Static)
-        RW.ReplaceText(FD->getInnerLocStart(), 6, "static inline");
+      if (funcDecl->getStorageClass() == SC_Static)
+        RW.ReplaceText(funcDecl->getInnerLocStart(), 6, "static inline");
     }
   }
 
-  void NetworkDriverRewriteVisitor::InstrumentEntryPoints(FunctionDecl* FD, string fdFile)
+  void NetworkDriverRewriteVisitor::InstrumentEntryPoints(FunctionDecl* funcDecl, string fdFile)
   {
-    if (!(DI->getInstance().ExistsEntryPointWithName(FD->getNameInfo().getName().getAsString())))
+    if (!(DI->getInstance().ExistsEntryPointWithName(funcDecl->getNameInfo().getName().getAsString())))
       return;
 
-    if (FD->getStorageClass() == SC_Static)
-      RW.RemoveText(FD->getInnerLocStart(), 7);
+    if (funcDecl->getStorageClass() == SC_Static)
+      RW.RemoveText(funcDecl->getInnerLocStart(), 7);
 
-    if (DI->getInstance().GetInitFunction() == FD->getNameInfo().getName().getAsString())
+    if (DI->getInstance().GetInitFunction() == funcDecl->getNameInfo().getName().getAsString())
       return;
 
-    if (FD->getParamDecl(0)->getOriginalType().getAsString() != "struct device *" &&
-        FD->getParamDecl(0)->getOriginalType().getAsString() != "struct pci_dev *")
+    if (funcDecl->getParamDecl(0)->getOriginalType().getAsString() != "struct device *" &&
+      funcDecl->getParamDecl(0)->getOriginalType().getAsString() != "struct pci_dev *")
       return;
 
-    SourceRange sr = FD->getParamDecl(0)->getSourceRange();
+    SourceRange sr = funcDecl->getParamDecl(0)->getSourceRange();
 
     RW.InsertTextBefore(sr.getBegin(), "struct net_device *dev, ");
 
-    Stmt *body = FD->getBody();
+    Stmt *body = funcDecl->getBody();
     list<DeclStmt*> stmtsToRewrite;
 
     for (auto i = body->child_begin(), e = body->child_end(); i != e; ++i)
@@ -97,13 +97,13 @@ namespace chauffeur
     }
   }
 
-  void NetworkDriverRewriteVisitor::InstrumentInitWithEntryPointCalls(FunctionDecl* FD, string fdFile)
+  void NetworkDriverRewriteVisitor::InstrumentInitWithEntryPointCalls(FunctionDecl* funcDecl, string fdFile)
   {
-    if (FD->getNameInfo().getName().getAsString() != DI->getInstance().GetInitFunction())
+    if (funcDecl->getNameInfo().getName().getAsString() != DI->getInstance().GetInitFunction())
       return;
 
     string device_str;
-    Stmt *body = FD->getBody();
+    Stmt *body = funcDecl->getBody();
 
     for (auto i = body->child_begin(), e = body->child_end(); i != e; ++i)
     {
@@ -134,7 +134,7 @@ namespace chauffeur
       return;
 
     map<string, string> func_params;
-    for (auto i = FD->param_begin(), e = FD->param_end(); i != e; ++i)
+    for (auto i = funcDecl->param_begin(), e = funcDecl->param_end(); i != e; ++i)
     {
       ValueDecl *paramVal = cast<ValueDecl>(*i);
       NamedDecl *paramNam = cast<NamedDecl>(*i);

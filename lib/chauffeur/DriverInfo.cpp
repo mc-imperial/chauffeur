@@ -30,6 +30,13 @@ namespace chauffeur
 		entry_point_pairs[type][funcname] = entrypoint;
 	}
 
+	void DriverInfo::AddFunctionPointerInformation(string field, string type, string info)
+	{
+		map<string, string> fpInfo;
+		fpInfo[type] = info;
+		function_pointer_information[field].push_back(fpInfo);
+	}
+
 	DriverType DriverInfo::GetType()
 	{
 		return driver_type;
@@ -89,7 +96,46 @@ namespace chauffeur
 
 			for(auto j = i->second.begin(); j != i->second.end(); j++)
 			{
-				output.append(j->first + "::" +j->second + "\n");
+				output.append(j->first + "::" + j->second + "\n");
+			}
+
+			output.append("</>\n");
+		}
+
+		llvm::raw_ostream *ros = fos;
+
+		ros->write(output.data(), output.size());
+	}
+
+	void DriverInfo::PrintFunctionPointerInfo()
+	{
+		string file = FileName;
+		file.append(".fp.info");
+		string error_msg;
+		llvm::raw_fd_ostream *fos = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
+		if (!error_msg.empty())
+		{
+			if (llvm::errs().has_colors()) llvm::errs().changeColor(llvm::raw_ostream::RED);
+			llvm::errs() << "error: " << error_msg << "\n";
+			if (llvm::errs().has_colors()) llvm::errs().resetColor();
+			exit(1);
+		}
+
+		fos->SetUnbuffered();
+		fos->SetUseAtomicWrites(true);
+
+		string output = "";
+
+		for(auto i = function_pointer_information.begin(); i != function_pointer_information.end(); i++)
+		{
+			output.append("<" + i->first + ">\n");
+
+			for(auto j = i->second.begin(); j != i->second.end(); j++)
+			{
+				for(auto z = j->begin(); z != j->end(); z++)
+				{
+					output.append(z->first + "::" + z->second + "\n");
+				}
 			}
 
 			output.append("</>\n");

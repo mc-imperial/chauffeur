@@ -16,7 +16,7 @@ using namespace clang::driver;
 using namespace clang::tooling;
 using namespace llvm;
 
-static OwningPtr<llvm::opt::OptTable> Options(createDriverOptTable());
+static std::unique_ptr<llvm::opt::OptTable> Options(createDriverOptTable());
 
 static cl::opt<bool> ASTDump("ast-dump",
     cl::desc(Options->getOptionHelpText(options::OPT_ast_dump)));
@@ -28,6 +28,8 @@ static cl::opt<std::string> ASTDumpFilter("ast-dump-filter",
     cl::desc(Options->getOptionHelpText(options::OPT_ast_dump_filter)));
 static cl::opt<bool> ASTInline("inline",
     cl::desc("Inline all non entry point device driver functions"));
+
+static cl::OptionCategory ToolCategory("Chauffeur options");
 
 namespace chauffeur
 {
@@ -51,8 +53,8 @@ namespace chauffeur
 
 int main(int argc, const char **argv)
 {
-	CommonOptionsParser op(argc, argv);
+	CommonOptionsParser op(argc, argv, ToolCategory);
 	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 	chauffeur::FileName = op.getSourcePathList()[0].substr(0, op.getSourcePathList()[0].find_last_of("."));
-	return Tool.run(newFrontendActionFactory<chauffeur::ParseDriverASTAction>());
+	return Tool.run(newFrontendActionFactory<chauffeur::ParseDriverASTAction>().get());
 }

@@ -37,7 +37,9 @@ namespace chauffeur
       RW.setSourceMgr(Context->getSourceManager(), Context->getLangOpts());
     }
 
-		virtual bool VisitFunctionDecl(FunctionDecl* FD);
+    virtual ~TestDriverRewriteVisitor() {}
+
+		virtual bool VisitFunctionDecl(FunctionDecl* funcDecl);
 
 		void Finalise();
 	};

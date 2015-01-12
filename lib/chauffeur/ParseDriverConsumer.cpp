@@ -13,6 +13,9 @@ namespace chauffeur
     FEPV->TraverseDecl(Context.getTranslationUnitDecl());
     FEPV->PrintEntryPoints();
 
+    FFPV->TraverseDecl(Context.getTranslationUnitDecl());
+    FFPV->PrintFunctionPointers();
+
     if (DI->getInstance().GetType() == TEST_DRIVER)
     {
       TDRV->TraverseDecl(Context.getTranslationUnitDecl());

@@ -49,7 +49,7 @@ if (NOT WIN32 OR MSYS OR CYGWIN)
 
 	set(CLANG_LIBS -lclangTooling -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization
 					-lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers
-					-lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangRewriteCore
+					-lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangRewrite
 					-lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic ${LLVM_LIBS} -lcurses)
 
 else ()
@@ -84,6 +84,7 @@ add_executable(chauffeur
   tools/chauffeur.cpp
   lib/chauffeur/ParseDriverConsumer.cpp
   lib/chauffeur/FindEntryPointsVisitor.cpp
+  lib/chauffeur/FindFunctionPointersVisitor.cpp
   lib/chauffeur/TestDriverRewriteVisitor.cpp
   lib/chauffeur/NetworkDriverRewriteVisitor.cpp
   lib/chauffeur/DriverInfo.cpp)

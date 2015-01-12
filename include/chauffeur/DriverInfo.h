@@ -20,6 +20,7 @@ namespace chauffeur
     string init_function;
 		map<string, list<string> > entry_points;
     map<string, map<string, string> > entry_point_pairs;
+    map<string, list<map<string, string> > > function_pointer_information;
     DriverType driver_type;
 
 		DriverInfo() {}
@@ -34,22 +35,21 @@ namespace chauffeur
     }
 
     void SetType(DriverType type);
-
     void SetInitFunction(string entrypoint);
 
     void AddEntryPoint(string entrypoint, list<string> params);
-
 		void AddEntryPointPair(string type, string funcname, string entrypoint);
 
+    void AddFunctionPointerInformation(string field, string type, string info);
+
     DriverType GetType();
-
     string GetInitFunction();
-
     map<string, list<string> > GetEntryPoints();
 
 		bool ExistsEntryPointWithName(string name);
 
 		void PrintDriverInfo();
+    void PrintFunctionPointerInfo();
 	};
 }
 
