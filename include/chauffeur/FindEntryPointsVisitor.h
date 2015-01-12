@@ -28,8 +28,6 @@ namespace chauffeur
     virtual ~FindEntryPointsVisitor() {}
 
 		virtual bool VisitVarDecl(VarDecl* varDecl);
-
-		void PrintEntryPoints();
 	};
 }
 

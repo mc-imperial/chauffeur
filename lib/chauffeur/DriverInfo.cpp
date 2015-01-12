@@ -30,11 +30,21 @@ namespace chauffeur
 		entry_point_pairs[type][funcname] = entrypoint;
 	}
 
-	void DriverInfo::AddFunctionPointerInformation(string field, string type, string info)
+	void DriverInfo::AddFunctionPointerInformation(string fp, string type, string info)
 	{
 		map<string, string> fpInfo;
 		fpInfo[type] = info;
-		function_pointer_information[field].push_back(fpInfo);
+		function_pointer_information[fp].push_back(fpInfo);
+	}
+
+	void DriverInfo::AddFunctionPointerCallInformation(string fp, string type, string info)
+	{
+		if (function_pointer_information.find(fp) != function_pointer_information.end() )
+		{
+			map<string, string> fpInfo;
+			fpInfo[type] = info;
+			function_pointer_information[fp].push_back(fpInfo);
+		}
 	}
 
 	DriverType DriverInfo::GetType()

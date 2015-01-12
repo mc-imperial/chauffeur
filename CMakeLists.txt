@@ -85,6 +85,7 @@ add_executable(chauffeur
   lib/chauffeur/ParseDriverConsumer.cpp
   lib/chauffeur/FindEntryPointsVisitor.cpp
   lib/chauffeur/FindFunctionPointersVisitor.cpp
+  lib/chauffeur/FindFunctionPointerCallsVisitor.cpp
   lib/chauffeur/TestDriverRewriteVisitor.cpp
   lib/chauffeur/NetworkDriverRewriteVisitor.cpp
   lib/chauffeur/DriverInfo.cpp)

@@ -40,7 +40,8 @@ namespace chauffeur
     void AddEntryPoint(string entrypoint, list<string> params);
 		void AddEntryPointPair(string type, string funcname, string entrypoint);
 
-    void AddFunctionPointerInformation(string field, string type, string info);
+    void AddFunctionPointerInformation(string fp, string type, string info);
+    void AddFunctionPointerCallInformation(string fp, string type, string info);
 
     DriverType GetType();
     string GetInitFunction();

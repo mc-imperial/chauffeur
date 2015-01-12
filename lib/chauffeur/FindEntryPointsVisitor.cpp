@@ -132,9 +132,4 @@ namespace chauffeur
 
     return true;
   }
-
-  void FindEntryPointsVisitor::PrintEntryPoints()
-  {
-    DI->getInstance().PrintDriverInfo();
-  }
 }

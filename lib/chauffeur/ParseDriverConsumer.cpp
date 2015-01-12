@@ -11,10 +11,11 @@ namespace chauffeur
   void ParseDriverConsumer::HandleTranslationUnit(ASTContext &Context)
   {
     FEPV->TraverseDecl(Context.getTranslationUnitDecl());
-    FEPV->PrintEntryPoints();
+    DI->getInstance().PrintDriverInfo();
 
     FFPV->TraverseDecl(Context.getTranslationUnitDecl());
-    FFPV->PrintFunctionPointers();
+    FFPCV->TraverseDecl(Context.getTranslationUnitDecl());
+    DI->getInstance().PrintFunctionPointerInfo();
 
     if (DI->getInstance().GetType() == TEST_DRIVER)
     {

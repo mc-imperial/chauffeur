@@ -8,6 +8,7 @@
 
 #include "chauffeur/FindEntryPointsVisitor.h"
 #include "chauffeur/FindFunctionPointersVisitor.h"
+#include "chauffeur/FindFunctionPointerCallsVisitor.h"
 #include "chauffeur/TestDriverRewriteVisitor.h"
 #include "chauffeur/NetworkDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
@@ -22,6 +23,7 @@ namespace chauffeur
     DriverInfo *DI;
 	  FindEntryPointsVisitor *FEPV;
     FindFunctionPointersVisitor *FFPV;
+    FindFunctionPointerCallsVisitor *FFPCV;
     TestDriverRewriteVisitor *TDRV;
 		NetworkDriverRewriteVisitor *NDRV;
 
@@ -29,6 +31,7 @@ namespace chauffeur
 	  explicit ParseDriverConsumer(CompilerInstance *CI, bool doInline)
 	    : FEPV(new FindEntryPointsVisitor(CI)),
         FFPV(new FindFunctionPointersVisitor(CI)),
+        FFPCV(new FindFunctionPointerCallsVisitor(CI)),
         TDRV(new TestDriverRewriteVisitor(CI, doInline)),
         NDRV(new NetworkDriverRewriteVisitor(CI, doInline))
 		{}

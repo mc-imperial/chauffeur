@@ -43,9 +43,6 @@ namespace chauffeur
       return true;
     }
 
-    llvm::errs() << "binOp: " << "\n";
-    binOp->dumpColor();
-
     if (!isa<ImplicitCastExpr>(lhsExpr->getBase()))
     {
       return true;
@@ -63,18 +60,9 @@ namespace chauffeur
     istringstream iss(lhsDeclExpr->getDecl()->getType().getCanonicalType().getAsString());
     vector<string> tokens{istream_iterator<string>{iss}, istream_iterator<string>{}};
 
-    llvm::errs() << "test: " << tokens[1] << "\n";
-    llvm::errs() << "test: " << lhsNamedDecl->getNameAsString() << "\n";
-    llvm::errs() << "test: " << rhsDeclExpr->getDecl()->getNameAsString() << "\n";
-
     DI->getInstance().AddFunctionPointerInformation(tokens[1] + "." + lhsNamedDecl->getNameAsString(),
-      "fp", rhsDeclExpr->getDecl()->getNameAsString());
+      "decl", rhsDeclExpr->getDecl()->getNameAsString());
 
     return true;
-  }
-
-  void FindFunctionPointersVisitor::PrintFunctionPointers()
-  {
-    DI->getInstance().PrintFunctionPointerInfo();
   }
 }
