@@ -81,17 +81,22 @@ namespace chauffeur
       if (!macroInfo->isFunctionLike())
         continue;
 
+      string name = "";
+      string fp = "";
+      string decl = "";
+      string param = "";
+
       for (MacroInfo::tokens_iterator ti = macroInfo->tokens_begin(), te = macroInfo->tokens_end(); ti != te; ++ti)
       {
-        string fp = DI->getInstance().GetFunctionPointerInformation(PP->getSpelling(*ti));
-        if (fp.length() == 0)
+        string tempFp = DI->getInstance().GetFunctionPointerInformation(PP->getSpelling(*ti));
+        string tempName = PP->getSpelling(*ti);
+        if (tempFp.length() == 0)
           continue;
 
         ++ti;
         if (strcmp(ti->getName(), "equal") != 0)
           continue;
 
-        string decl = "";
         ++ti;
         while((strcmp(ti->getName(), "identifier") == 0) || (strcmp(ti->getName(), "hashhash") == 0))
         {
@@ -99,8 +104,38 @@ namespace chauffeur
           ++ti;
         }
 
-        DI->getInstance().AddFunctionPointerInformation(fp, "macro", decl);
+        fp = tempFp + "";
+        name = tempName + "";
       }
+
+      if (decl.length() == 0)
+        continue;
+      
+      for (MacroInfo::tokens_iterator ti = macroInfo->tokens_begin(), te = macroInfo->tokens_end(); ti != te; ++ti)
+      {
+        if (strcmp(ti->getName(), "identifier") != 0)
+          continue;
+        if (PP->getSpelling(*ti) + "." + name != fp)
+          continue;
+
+        string temp = "";
+
+        ++ti;
+        if (strcmp(ti->getName(), "identifier") == 0)
+          temp = PP->getSpelling(*ti);
+
+        ++ti;
+        if (strcmp(ti->getName(), "equal") != 0)
+          continue;
+
+        ++ti;
+        if (strcmp(ti->getName(), "l_brace") != 0)
+          continue;
+
+        param = temp + "";
+      }
+
+      DI->getInstance().AddFunctionPointerInformation(fp, "macro", param + "::" + decl);
     }
   }
 }
