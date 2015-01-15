@@ -42,12 +42,15 @@ namespace chauffeur
 
     void AddFunctionPointerInformation(string fp, string type, string info);
     void AddFunctionPointerCallInformation(string fp, string type, string info);
+    void MergeFunctionPointerInformation(string left, string right);
+    string GetFunctionPointerInformation(string name);
 
     DriverType GetType();
     string GetInitFunction();
     map<string, list<string> > GetEntryPoints();
 
 		bool ExistsEntryPointWithName(string name);
+    bool IsDriverModule(string name);
 
 		void PrintDriverInfo();
     void PrintFunctionPointerInfo();

@@ -39,12 +39,43 @@ namespace chauffeur
 
 	void DriverInfo::AddFunctionPointerCallInformation(string fp, string type, string info)
 	{
-		if (function_pointer_information.find(fp) != function_pointer_information.end() )
+		map<string, string> fpInfo;
+		fpInfo[type] = info;
+		function_pointer_information[fp].push_back(fpInfo);
+	}
+
+	void DriverInfo::MergeFunctionPointerInformation(string left, string right)
+	{
+		if ((function_pointer_information.find(left) == function_pointer_information.end()) ||
+			(function_pointer_information.find(right) == function_pointer_information.end()))
 		{
-			map<string, string> fpInfo;
-			fpInfo[type] = info;
-			function_pointer_information[fp].push_back(fpInfo);
+			return;
 		}
+
+		function_pointer_information[left].splice(function_pointer_information[left].begin(),
+		  function_pointer_information[right]);
+		function_pointer_information.erase(right);
+	}
+
+	string DriverInfo::GetFunctionPointerInformation(string name)
+	{
+		for(auto i = function_pointer_information.begin(); i != function_pointer_information.end(); i++)
+		{
+			for(auto j = i->second.begin(); j != i->second.end(); j++)
+			{
+				for(auto z = j->begin(); z != j->end(); z++)
+				{
+					if (z->first != "call")
+						continue;
+					if (z->second.find(name + "::") != 0)
+						continue;
+
+					return i->first;
+				}
+			}
+		}
+
+		return "";
 	}
 
 	DriverType DriverInfo::GetType()
@@ -79,6 +110,17 @@ namespace chauffeur
 		  exists = true;
 
 		return exists;
+	}
+
+	bool DriverInfo::IsDriverModule(string name)
+	{
+		if (name == "pci_driver" || name == "dev_pm_ops" || name == "net_device_ops" ||
+			name == "ethtool_ops" || name == "test_driver")
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	void DriverInfo::PrintDriverInfo()
@@ -120,7 +162,7 @@ namespace chauffeur
 	void DriverInfo::PrintFunctionPointerInfo()
 	{
 		string file = FileName;
-		file.append("_fp.info");
+		file.append(".fp.info");
 		string error_msg;
 		llvm::raw_fd_ostream *fos = new llvm::raw_fd_ostream(file.c_str(), error_msg, llvm::sys::fs::F_None);
 		if (!error_msg.empty())

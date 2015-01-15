@@ -3,35 +3,38 @@
 // This file is distributed under the MIT License. See LICENSE for details.
 //
 
-#ifndef FINDFUNCTIONPOINTERSVISITOR_H
-#define FINDFUNCTIONPOINTERSVISITOR_H
+#ifndef MATCHFUNCTIONPOINTERSVISITOR_H
+#define MATCHFUNCTIONPOINTERSVISITOR_H
 
 #include "chauffeur/DriverInfo.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Lex/Preprocessor.h"
 
 
 namespace chauffeur
 {
   using namespace clang;
 
-	class FindFunctionPointersVisitor : public RecursiveASTVisitor<FindFunctionPointersVisitor> {
+	class MatchFunctionPointersVisitor : public RecursiveASTVisitor<MatchFunctionPointersVisitor> {
 	private:
 		ASTContext *Context;
+    Preprocessor *PP;
 		DriverInfo *DI;
 
-    void AnalyseInitListExpr(InitListExpr* initListExpr, string prefix);
-
 	public:
-	  explicit FindFunctionPointersVisitor(CompilerInstance *CI)
+	  explicit MatchFunctionPointersVisitor(CompilerInstance *CI)
 			: Context(&(CI->getASTContext()))
-		{}
+		{
+      PP = &CI->getPreprocessor();
+    }
 
-    virtual ~FindFunctionPointersVisitor() {}
+    virtual ~MatchFunctionPointersVisitor() {}
 
     virtual bool VisitBinaryOperator(BinaryOperator* binOp);
-    virtual bool VisitVarDecl(VarDecl* varDecl);
+
+    void AnalyseMacros();
 	};
 }
 
-#endif // FINDFUNCTIONPOINTERSVISITOR_H
+#endif // MATCHFUNCTIONPOINTERSVISITOR_H

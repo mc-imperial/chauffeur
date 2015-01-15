@@ -6,8 +6,8 @@
 #include "chauffeur/Chauffeur.h"
 #include "chauffeur/DriverType.h"
 #include "chauffeur/FindFunctionPointerCallsVisitor.h"
+#include "chauffeur/Utilities.h"
 #include "clang/AST/ASTContext.h"
-#include <sstream>
 
 namespace chauffeur
 {
@@ -18,18 +18,20 @@ namespace chauffeur
     string fdFileWithExt = Context->getSourceManager().getFilename(callExpr->getRParenLoc());
     string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
     if (fdFile.find(FileName) == std::string::npos)
-    {
       return true;
-    }
 
-    // llvm::errs() << "call:" << "\n";
-    // callExpr->dumpColor();
+    FunctionDecl *directCallee = callExpr->getDirectCallee();
+    if (directCallee != 0)
+    {
+      fdFileWithExt = Context->getSourceManager().getFilename(directCallee->getLocation());
+      fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
+      if (fdFile.find(FileName) == std::string::npos)
+        return true;
+    }
 
     Expr *callee = callExpr->getCallee();
     if (!isa<ImplicitCastExpr>(callee))
-    {
       return true;
-    }
 
     ImplicitCastExpr *calleeImplExpr = cast<ImplicitCastExpr>(callee);
     NamedDecl *calleeDecl;
@@ -48,15 +50,14 @@ namespace chauffeur
       {
         calleeImplExpr = cast<ImplicitCastExpr>(calleeMemExpr->getBase());
         if (!isa<DeclRefExpr>(calleeImplExpr->getSubExpr()))
-        {
           return true;
-        }
 
         DeclRefExpr *calleeDeclExpr = cast<DeclRefExpr>(calleeImplExpr->getSubExpr());
-        istringstream iss(calleeDeclExpr->getDecl()->getType().getCanonicalType().getAsString());
-        vector<string> tokens{istream_iterator<string>{iss}, istream_iterator<string>{}};
         calleeDecl = calleeMemExpr->getMemberDecl();
-        funcPointers["0"] = tokens[1] + "." + calleeDecl->getNameAsString();
+
+        string prefix = GetPrefix(calleeDeclExpr->getDecl()->getType().getCanonicalType().getAsString());
+
+        funcPointers["0"] = prefix + "." + calleeDecl->getNameAsString();
       }
       else if (isa<MemberExpr>(calleeMemExpr->getBase()))
       {
@@ -83,22 +84,16 @@ namespace chauffeur
         count++;
 
         if (!isa<ImplicitCastExpr>(*i))
-        {
           continue;
-        }
 
         ImplicitCastExpr *argImplExpr = cast<ImplicitCastExpr>(*i);
         if (!isa<MemberExpr>(argImplExpr->getSubExpr()))
-        {
           continue;
-        }
 
         MemberExpr *argMemExpr = cast<MemberExpr>(argImplExpr->getSubExpr());
         NamedDecl *argDecl = argMemExpr->getMemberDecl();
         if (!isa<MemberExpr>(argMemExpr->getBase()))
-        {
           continue;
-        }
 
         argMemExpr = cast<MemberExpr>(argMemExpr->getBase());
         funcPointers[to_string(count)] = argMemExpr->getMemberDecl()->getNameAsString() + "." + argDecl->getNameAsString();
@@ -106,9 +101,10 @@ namespace chauffeur
     }
 
     if (funcPointers.empty())
-    {
       return true;
-    }
+
+    // llvm::errs() << "call:" << "\n";
+    // callExpr->dumpColor();
 
     int line = Context->getSourceManager().getPresumedLineNumber(callExpr->getRParenLoc());
     for(auto i = funcPointers.begin(); i != funcPointers.end(); i++)

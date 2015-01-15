@@ -14,15 +14,14 @@ namespace chauffeur
 
   bool FindEntryPointsVisitor::VisitVarDecl(VarDecl* varDecl)
   {
-    if (!varDecl->getType()->isRecordType()) return true;
+    if (!varDecl->getType()->isRecordType())
+    {
+      return true;
+    }
 
     RecordDecl *baseRecDecl = varDecl->getType()->getAs<RecordType>()->getDecl();
 
-    if (!(baseRecDecl->getNameAsString() == "pci_driver" ||
-        baseRecDecl->getNameAsString() == "dev_pm_ops" ||
-        baseRecDecl->getNameAsString() == "net_device_ops" ||
-        baseRecDecl->getNameAsString() == "ethtool_ops" ||
-        baseRecDecl->getNameAsString() == "test_driver"))
+    if (!DI->IsDriverModule(baseRecDecl->getNameAsString()))
     {
       return true;
     }
@@ -32,9 +31,9 @@ namespace chauffeur
     else if (baseRecDecl->getNameAsString() == "net_device_ops")
       DI->getInstance().SetType(NETWORK_DRIVER);
 
-    InitListExpr *initExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
+    InitListExpr *initListExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
 
-    for (auto range = initExpr->children(); range; ++range)
+    for (auto range = initListExpr->children(); range; ++range)
     {
       DesignatedInitExpr *desExpr = cast<DesignatedInitExpr>(*range);
       if (desExpr->size() != 1) continue;
