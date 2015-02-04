@@ -7,6 +7,7 @@
 #define NETWORKDRIVERREWRITEVISITOR_H
 
 #include "chauffeur/DriverInfo.h"
+#include "chauffeur/AbstractDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -17,31 +18,22 @@ namespace chauffeur
 {
   using namespace clang;
 
-	class NetworkDriverRewriteVisitor : public RecursiveASTVisitor<NetworkDriverRewriteVisitor>
+	class NetworkDriverRewriteVisitor : public AbstractDriverRewriteVisitor
 	{
-	private:
-		ASTContext *Context;
-		Rewriter RW;
-		DriverInfo *DI;
-    bool DoInline;
+	protected:
+    virtual void InstrumentEntryPoints(FunctionDecl* FD, string fdFile);
+    virtual void CreateCheckerFunction(FunctionDecl* FD, string fdFile);
 
-    void InlineFunctions(FunctionDecl* FD, string fdFile);
-    void InstrumentEntryPoints(FunctionDecl* FD, string fdFile);
-    void InstrumentInitWithEntryPointCalls(FunctionDecl* FD, string fdFile);
+    virtual string GetSharedStructStr(CallExpr *callExpr);
 
 	public:
 	  explicit NetworkDriverRewriteVisitor(CompilerInstance *CI, bool doInline)
-      : Context(&(CI->getASTContext()))
+      : AbstractDriverRewriteVisitor(CI, doInline)
     {
-      DoInline = doInline;
-      RW.setSourceMgr(Context->getSourceManager(), Context->getLangOpts());
+
     }
 
     virtual ~NetworkDriverRewriteVisitor() {}
-
-		virtual bool VisitFunctionDecl(FunctionDecl* funcDecl);
-
-		void Finalise();
 	};
 }
 
