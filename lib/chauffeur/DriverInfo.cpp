@@ -115,7 +115,7 @@ namespace chauffeur
 	bool DriverInfo::IsDriverModule(string name)
 	{
 		if (name == "pci_driver" || name == "dev_pm_ops" || name == "net_device_ops" ||
-			name == "ethtool_ops" || name == "test_driver")
+			name == "ethtool_ops" || name == "file_operations" || name == "test_driver")
 		{
 			return true;
 		}

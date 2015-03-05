@@ -16,6 +16,38 @@ namespace chauffeur
   {
     if (!varDecl->getType()->isRecordType())
     {
+      if (varDecl->getNameAsString() == "_whoop_init")
+      {
+        ImplicitCastExpr *implExpr = cast<ImplicitCastExpr>(varDecl->getInit());
+        if (implExpr == NULL)
+        {
+          return true;
+        }
+
+        ImplicitCastExpr *implExpr2 = cast<ImplicitCastExpr>(implExpr->getSubExpr());
+        DeclRefExpr *declExpr = cast<DeclRefExpr>(implExpr2->getSubExpr());
+        DI->getInstance().AddEntryPointPair("char_driver", "probe",
+          declExpr->getFoundDecl()->getNameAsString());
+        DI->getInstance().SetInitFunction(declExpr->getFoundDecl()->getNameAsString());
+      }
+      else if (varDecl->getNameAsString() == "_whoop_exit")
+      {
+        ImplicitCastExpr *implExpr = cast<ImplicitCastExpr>(varDecl->getInit());
+        if (implExpr == NULL)
+        {
+          return true;
+        }
+
+        DeclRefExpr *declExpr = cast<DeclRefExpr>(implExpr->getSubExpr());
+
+        list<string> func_params;
+        func_params.push_back("void");
+        DI->getInstance().AddEntryPoint(declExpr->getFoundDecl()->getNameAsString(), func_params);
+
+        DI->getInstance().AddEntryPointPair("char_driver", "remove",
+          declExpr->getFoundDecl()->getNameAsString());
+      }
+
       return true;
     }
 
@@ -26,10 +58,12 @@ namespace chauffeur
       return true;
     }
 
-    if (baseRecDecl->getNameAsString() == "test_driver")
-      DI->getInstance().SetType(TEST_DRIVER);
-    else if (baseRecDecl->getNameAsString() == "net_device_ops")
+    if (baseRecDecl->getNameAsString() == "net_device_ops")
       DI->getInstance().SetType(NETWORK_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "test_driver")
+      DI->getInstance().SetType(TEST_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "file_operations")
+      DI->getInstance().SetType(CHAR_DRIVER);
 
     InitListExpr *initListExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
 
@@ -83,6 +117,12 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
+          /* file_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "llseek" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "write" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "unlocked_ioctl" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "open" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "release" ||
           /* test_driver */
           desExpr->getDesignator(0)->getFieldName()->getName() == "ep1" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "ep2" ||

@@ -10,8 +10,9 @@
 #include "chauffeur/FindFunctionPointersVisitor.h"
 #include "chauffeur/FindFunctionPointerCallsVisitor.h"
 #include "chauffeur/MatchFunctionPointersVisitor.h"
-#include "chauffeur/TestDriverRewriteVisitor.h"
 #include "chauffeur/NetworkDriverRewriteVisitor.h"
+#include "chauffeur/CharDriverRewriteVisitor.h"
+#include "chauffeur/TestDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTConsumer.h"
 
@@ -26,8 +27,9 @@ namespace chauffeur
     FindFunctionPointersVisitor *FFPV;
     FindFunctionPointerCallsVisitor *FFPCV;
     MatchFunctionPointersVisitor *MFPV;
-    TestDriverRewriteVisitor *TDRV;
 		NetworkDriverRewriteVisitor *NDRV;
+    CharDriverRewriteVisitor *CDRV;
+    TestDriverRewriteVisitor *TDRV;
 
 	public:
 	  explicit ParseDriverConsumer(CompilerInstance *CI, bool doInline)
@@ -35,8 +37,9 @@ namespace chauffeur
         FFPV(new FindFunctionPointersVisitor(CI)),
         FFPCV(new FindFunctionPointerCallsVisitor(CI)),
         MFPV(new MatchFunctionPointersVisitor(CI)),
-        TDRV(new TestDriverRewriteVisitor(CI, doInline)),
-        NDRV(new NetworkDriverRewriteVisitor(CI, doInline))
+        NDRV(new NetworkDriverRewriteVisitor(CI, doInline)),
+        CDRV(new CharDriverRewriteVisitor(CI, doInline)),
+        TDRV(new TestDriverRewriteVisitor(CI, doInline))
 		{}
 
 	  virtual void HandleTranslationUnit(ASTContext &Context);
