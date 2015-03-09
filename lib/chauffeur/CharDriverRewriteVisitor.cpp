@@ -71,10 +71,14 @@ namespace chauffeur
           entry_point_call += "whoop_inode, ";
         else if (*j == "struct file *")
           entry_point_call += "whoop_file, ";
+        else if (*j == "char *")
+          entry_point_call += "whoop_buf, ";
         else if (*j == "const char *")
           entry_point_call += "whoop_buf, ";
         else if (*j == "loff_t *")
           entry_point_call += "whoop_loff_t, ";
+        else if (*j == "loff_t")
+          entry_point_call += "&whoop_loff_t, ";
         else if (*j == "size_t")
           entry_point_call += "0, ";
         else if (*j == "int")

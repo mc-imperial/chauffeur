@@ -120,6 +120,8 @@ namespace chauffeur
           /* file_operations */
           desExpr->getDesignator(0)->getFieldName()->getName() == "llseek" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "write" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "read" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ioctl" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "unlocked_ioctl" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "open" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "release" ||
