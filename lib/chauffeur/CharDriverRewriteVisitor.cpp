@@ -46,10 +46,11 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
-    RW.InsertText(loc, "\tstruct inode *whoop_inode;\n", true, true);
-    RW.InsertText(loc, "\tstruct file *whoop_file;\n", true, true);
-    RW.InsertText(loc, "\tconst char *whoop_buf;\n", true, true);
-    RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t;\n\n", true, true);
+    RW.InsertText(loc, "\tstruct inode *whoop_inode = (struct inode *) malloc(sizeof(struct inode *));\n", true, true);
+    RW.InsertText(loc, "\tstruct file *whoop_file = (struct file *) malloc(sizeof(struct file *));\n", true, true);
+    RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
+    RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t *));\n\n", true, true);
+    RW.InsertText(loc, "\tstruct poll_table *whoop_poll_table = (struct poll_table *) malloc(sizeof(struct poll_table *));\n\n", true, true);
 
     auto entry_points = DI->getInstance().GetEntryPoints();
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
@@ -79,6 +80,8 @@ namespace chauffeur
           entry_point_call += "whoop_loff_t, ";
         else if (*j == "loff_t")
           entry_point_call += "&whoop_loff_t, ";
+        else if (*j == "poll_table *")
+          entry_point_call += "whoop_poll_table, ";
         else if (*j == "size_t")
           entry_point_call += "0, ";
         else if (*j == "int")

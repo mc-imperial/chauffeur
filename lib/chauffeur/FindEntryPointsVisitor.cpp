@@ -123,6 +123,7 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "read" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "ioctl" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "unlocked_ioctl" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "poll" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "open" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "release" ||
           /* test_driver */
