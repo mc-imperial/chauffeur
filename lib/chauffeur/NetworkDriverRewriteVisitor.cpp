@@ -176,14 +176,14 @@ namespace chauffeur
     RW.InsertText(loc, "\t" + shared_struct_str + "shared;\n", true, true);
     RW.InsertText(loc, "\tdev = alloc_etherdev(sizeof(*shared));\n\n", true, true);
 
-    RW.InsertText(loc, "\tstruct sk_buff *whoop_skb;\n", true, true);
-    RW.InsertText(loc, "\tstruct ethtool_wolinfo *whoop_wolinfo;\n", true, true);
-    RW.InsertText(loc, "\tstruct ethtool_cmd *whoop_ecmd;\n", true, true);
-    RW.InsertText(loc, "\tstruct ifreq *whoop_ifreq;\n", true, true);
-    RW.InsertText(loc, "\tstruct rtnl_link_stats64 *whoop_rtnlsts64;\n", true, true);
-    RW.InsertText(loc, "\tstruct ethtool_regs *whoop_ethtoolregs;\n", true, true);
-    RW.InsertText(loc, "\tstruct ethtool_stats *whoop_ethtoolsts;\n", true, true);
-    RW.InsertText(loc, "\tstruct ethtool_drvinfo *whoop_ethtooldrvinfo;\n", true, true);
+    RW.InsertText(loc, "\tstruct sk_buff *whoop_skb = (struct sk_buff *) malloc(sizeof(struct sk_buff *));\n", true, true);
+    RW.InsertText(loc, "\tstruct ethtool_wolinfo *whoop_wolinfo = (struct ethtool_wolinfo *) malloc(sizeof(struct ethtool_wolinfo *));\n", true, true);
+    RW.InsertText(loc, "\tstruct ethtool_cmd *whoop_ecmd = (struct ethtool_cmd *) malloc(sizeof(struct ethtool_cmd *));\n", true, true);
+    RW.InsertText(loc, "\tstruct ifreq *whoop_ifreq = (struct ifreq *) malloc(sizeof(struct ifreq *));\n", true, true);
+    RW.InsertText(loc, "\tstruct rtnl_link_stats64 *whoop_rtnlsts64 = (struct rtnl_link_stats64 *) malloc(sizeof(struct rtnl_link_stats64 *));\n", true, true);
+    RW.InsertText(loc, "\tstruct ethtool_regs *whoop_ethtoolregs = (struct ethtool_regs *) malloc(sizeof(struct ethtool_regs *));\n", true, true);
+    RW.InsertText(loc, "\tstruct ethtool_stats *whoop_ethtoolsts = (struct ethtool_stats *) malloc(sizeof(struct ethtool_stats *));\n", true, true);
+    RW.InsertText(loc, "\tstruct ethtool_drvinfo *whoop_ethtooldrvinfo = (struct ethtool_drvinfo *) malloc(sizeof(struct ethtool_drvinfo *));\n", true, true);
     RW.InsertText(loc, "\tnetdev_features_t whoop_netdevfeat = NETIF_F_RXCSUM;\n\n", true, true);
 
     auto entry_points = DI->getInstance().GetEntryPoints();
