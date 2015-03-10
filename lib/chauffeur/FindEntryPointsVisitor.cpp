@@ -26,7 +26,7 @@ namespace chauffeur
 
         ImplicitCastExpr *implExpr2 = cast<ImplicitCastExpr>(implExpr->getSubExpr());
         DeclRefExpr *declExpr = cast<DeclRefExpr>(implExpr2->getSubExpr());
-        DI->getInstance().AddEntryPointPair("char_driver", "probe",
+        DI->getInstance().AddEntryPointPair("whoop_driver_ops", "probe",
           declExpr->getFoundDecl()->getNameAsString());
         DI->getInstance().SetInitFunction(declExpr->getFoundDecl()->getNameAsString());
       }
@@ -44,7 +44,7 @@ namespace chauffeur
         func_params.push_back("void");
         DI->getInstance().AddEntryPoint(declExpr->getFoundDecl()->getNameAsString(), func_params);
 
-        DI->getInstance().AddEntryPointPair("char_driver", "remove",
+        DI->getInstance().AddEntryPointPair("whoop_driver_ops", "remove",
           declExpr->getFoundDecl()->getNameAsString());
       }
 
@@ -58,12 +58,14 @@ namespace chauffeur
       return true;
     }
 
-    if (baseRecDecl->getNameAsString() == "net_device_ops")
+    if (baseRecDecl->getNameAsString() == "file_operations")
+      DI->getInstance().SetType(CHAR_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "block_device_operations")
+      DI->getInstance().SetType(BLOCK_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "net_device_ops")
       DI->getInstance().SetType(NETWORK_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
-    else if (baseRecDecl->getNameAsString() == "file_operations")
-      DI->getInstance().SetType(CHAR_DRIVER);
 
     InitListExpr *initListExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
 
@@ -78,6 +80,17 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "probe" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "remove" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "shutdown" ||
+          /* file_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "llseek" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "write" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "read" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "ioctl" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "unlocked_ioctl" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "poll" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "open" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "release" ||
+          /* block_device_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "media_changed" ||
           /* dev_pm_ops */
           desExpr->getDesignator(0)->getFieldName()->getName() == "suspend" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "resume" ||
@@ -117,15 +130,6 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
-          /* file_operations */
-          desExpr->getDesignator(0)->getFieldName()->getName() == "llseek" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "write" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "read" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "ioctl" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "unlocked_ioctl" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "poll" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "open" ||
-          desExpr->getDesignator(0)->getFieldName()->getName() == "release" ||
           /* test_driver */
           desExpr->getDesignator(0)->getFieldName()->getName() == "ep1" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "ep2" ||

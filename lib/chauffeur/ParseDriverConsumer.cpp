@@ -19,15 +19,21 @@ namespace chauffeur
     MFPV->AnalyseMacros();
     DI->getInstance().PrintFunctionPointerInfo();
 
-    if (DI->getInstance().GetType() == NETWORK_DRIVER)
-    {
-      NDRV->TraverseDecl(Context.getTranslationUnitDecl());
-      NDRV->Finalise();
-    }
-    else if (DI->getInstance().GetType() == CHAR_DRIVER)
+
+    if (DI->getInstance().GetType() == CHAR_DRIVER)
     {
       CDRV->TraverseDecl(Context.getTranslationUnitDecl());
       CDRV->Finalise();
+    }
+    else if (DI->getInstance().GetType() == BLOCK_DRIVER)
+    {
+      BDRV->TraverseDecl(Context.getTranslationUnitDecl());
+      BDRV->Finalise();
+    }
+    else if (DI->getInstance().GetType() == NETWORK_DRIVER)
+    {
+      NDRV->TraverseDecl(Context.getTranslationUnitDecl());
+      NDRV->Finalise();
     }
     else if (DI->getInstance().GetType() == TEST_DRIVER)
     {

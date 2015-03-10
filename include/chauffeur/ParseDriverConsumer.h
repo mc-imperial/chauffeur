@@ -10,8 +10,9 @@
 #include "chauffeur/FindFunctionPointersVisitor.h"
 #include "chauffeur/FindFunctionPointerCallsVisitor.h"
 #include "chauffeur/MatchFunctionPointersVisitor.h"
-#include "chauffeur/NetworkDriverRewriteVisitor.h"
 #include "chauffeur/CharDriverRewriteVisitor.h"
+#include "chauffeur/BlockDriverRewriteVisitor.h"
+#include "chauffeur/NetworkDriverRewriteVisitor.h"
 #include "chauffeur/TestDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTConsumer.h"
@@ -27,8 +28,9 @@ namespace chauffeur
     FindFunctionPointersVisitor *FFPV;
     FindFunctionPointerCallsVisitor *FFPCV;
     MatchFunctionPointersVisitor *MFPV;
-		NetworkDriverRewriteVisitor *NDRV;
     CharDriverRewriteVisitor *CDRV;
+    BlockDriverRewriteVisitor *BDRV;
+		NetworkDriverRewriteVisitor *NDRV;
     TestDriverRewriteVisitor *TDRV;
 
 	public:
@@ -37,8 +39,9 @@ namespace chauffeur
         FFPV(new FindFunctionPointersVisitor(CI)),
         FFPCV(new FindFunctionPointerCallsVisitor(CI)),
         MFPV(new MatchFunctionPointersVisitor(CI)),
-        NDRV(new NetworkDriverRewriteVisitor(CI, doInline)),
         CDRV(new CharDriverRewriteVisitor(CI, doInline)),
+        BDRV(new BlockDriverRewriteVisitor(CI, doInline)),
+        NDRV(new NetworkDriverRewriteVisitor(CI, doInline)),
         TDRV(new TestDriverRewriteVisitor(CI, doInline))
 		{}
 

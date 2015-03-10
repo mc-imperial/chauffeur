@@ -11,8 +11,9 @@ namespace chauffeur
   enum DriverType
   {
     TEST_DRIVER,
-    NETWORK_DRIVER,
-    CHAR_DRIVER
+    CHAR_DRIVER,
+    BLOCK_DRIVER,
+    NETWORK_DRIVER
   };
 }
 
