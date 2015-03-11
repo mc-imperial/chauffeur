@@ -46,12 +46,21 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
-    RW.InsertText(loc, "\tstruct block_device *whoop_bdev = (struct block_device *) malloc(sizeof(struct block_device *));\n", true, true);
-    RW.InsertText(loc, "\tstruct hd_geometry *whoop_geo = (struct hd_geometry *) malloc(sizeof(struct hd_geometry *));\n", true, true);
     RW.InsertText(loc, "\tstruct inode *whoop_inode = (struct inode *) malloc(sizeof(struct inode *));\n", true, true);
+    RW.InsertText(loc, "\tstruct super_block *whoop_super_block = (struct super_block *) malloc(sizeof(struct super_block *));\n", true, true);
+    RW.InsertText(loc, "\tstruct vfsmount *whoop_vfsmount = (struct vfsmount *) malloc(sizeof(struct vfsmount *));\n", true, true);
     RW.InsertText(loc, "\tstruct file *whoop_file = (struct file *) malloc(sizeof(struct file *));\n", true, true);
+    RW.InsertText(loc, "\tstruct page *whoop_page = (struct page *) malloc(sizeof(struct page *));\n", true, true);
+    RW.InsertText(loc, "\tstruct page **whoop_vpage = (struct page **) malloc(sizeof(struct page *) * 32);\n", true, true);
+    RW.InsertText(loc, "\tstruct writeback_control *whoop_writeback_control = (struct writeback_control *) malloc(sizeof(struct writeback_control *));\n", true, true);
+    RW.InsertText(loc, "\tstruct address_space *whoop_address_space = (struct address_space *) malloc(sizeof(struct address_space *));\n", true, true);
+    RW.InsertText(loc, "\tstruct dentry *whoop_dentry = (struct dentry *) malloc(sizeof(struct dentry *));\n", true, true);
+    RW.InsertText(loc, "\tstruct kstatfs *whoop_kstatfs = (struct kstatfs *) malloc(sizeof(struct kstatfs *));\n", true, true);
+    RW.InsertText(loc, "\tstruct kstat *whoop_kstat = (struct kstat *) malloc(sizeof(struct kstat *));\n", true, true);
+    RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t *));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
-    RW.InsertText(loc, "\tstruct gendisk *whoop_disk = (struct gendisk *) malloc(sizeof(struct gendisk *));\n\n", true, true);
+    RW.InsertText(loc, "\tconst void **whoop_vbuf = (void **) malloc(sizeof(char *) * 32);\n", true, true);
+    RW.InsertText(loc, "\tconst int *whoop_int = (int *) malloc(sizeof(int *));\n\n", true, true);
 
     auto entry_points = DI->getInstance().GetEntryPoints();
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
@@ -65,26 +74,46 @@ namespace chauffeur
           entry_point_call += "";
         else if (*j == "void *")
           entry_point_call += "NULL, ";
+        else if (*j == "void **")
+          entry_point_call += "whoop_vbuf, ";
         else if (*j == "u64 *")
           entry_point_call += "NULL, ";
         else if (*j == "u8 *")
           entry_point_call += "NULL, ";
-        else if (*j == "struct block_device *")
-          entry_point_call += "whoop_bdev, ";
-        else if (*j == "struct hd_geometry *")
-          entry_point_call += "whoop_geo, ";
         else if (*j == "struct inode *")
           entry_point_call += "whoop_inode, ";
+        else if (*j == "struct super_block *")
+          entry_point_call += "whoop_super_block, ";
+        else if (*j == "struct vfsmount *")
+          entry_point_call += "whoop_vfsmount, ";
         else if (*j == "struct file *")
           entry_point_call += "whoop_file, ";
-        else if (*j == "struct gendisk *")
-          entry_point_call += "whoop_disk, ";
+        else if (*j == "struct page **")
+          entry_point_call += "whoop_vpage, ";
+        else if (*j == "struct page *")
+          entry_point_call += "whoop_page, ";
+        else if (*j == "struct writeback_control *")
+          entry_point_call += "whoop_writeback_control, ";
+        else if (*j == "struct address_space *")
+          entry_point_call += "whoop_address_space, ";
+        else if (*j == "struct dentry *")
+          entry_point_call += "whoop_dentry, ";
+        else if (*j == "struct kstatfs *")
+          entry_point_call += "whoop_kstatfs, ";
+        else if (*j == "struct kstat *")
+          entry_point_call += "whoop_kstat, ";
+        else if (*j == "loff_t *")
+          entry_point_call += "whoop_loff_t, ";
+        else if (*j == "loff_t")
+          entry_point_call += "&whoop_loff_t, ";
         else if (*j == "char *")
           entry_point_call += "whoop_buf, ";
         else if (*j == "const char *")
           entry_point_call += "whoop_buf, ";
         else if (*j == "size_t")
           entry_point_call += "0, ";
+        else if (*j == "int *")
+          entry_point_call += "whoop_int, ";
         else if (*j == "int")
           entry_point_call += "0, ";
         else if (*j == "unsigned int")
