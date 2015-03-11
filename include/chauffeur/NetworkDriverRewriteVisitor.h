@@ -24,6 +24,7 @@ namespace chauffeur
     virtual void InstrumentEntryPoints(FunctionDecl* FD, string fdFile);
     virtual void CreateCheckerFunction(FunctionDecl* FD, string fdFile);
 
+    virtual string GetSharedStructStrInFunctionBody(Stmt *body);
     virtual string GetSharedStructStr(CallExpr *callExpr);
 
 	public:
