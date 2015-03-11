@@ -90,6 +90,8 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "open" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "release" ||
           /* block_device_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "getgeo" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "revalidate_disk" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "media_changed" ||
           /* dev_pm_ops */
           desExpr->getDesignator(0)->getFieldName()->getName() == "suspend" ||

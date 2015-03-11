@@ -46,6 +46,8 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
+    RW.InsertText(loc, "\tstruct block_device *whoop_bdev = (struct block_device *) malloc(sizeof(struct block_device *));\n", true, true);
+    RW.InsertText(loc, "\tstruct hd_geometry *whoop_geo = (struct hd_geometry *) malloc(sizeof(struct hd_geometry *));\n", true, true);
     RW.InsertText(loc, "\tstruct inode *whoop_inode = (struct inode *) malloc(sizeof(struct inode *));\n", true, true);
     RW.InsertText(loc, "\tstruct file *whoop_file = (struct file *) malloc(sizeof(struct file *));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
@@ -67,6 +69,10 @@ namespace chauffeur
           entry_point_call += "NULL, ";
         else if (*j == "u8 *")
           entry_point_call += "NULL, ";
+        else if (*j == "struct block_device *")
+          entry_point_call += "whoop_bdev, ";
+        else if (*j == "struct hd_geometry *")
+          entry_point_call += "whoop_geo, ";
         else if (*j == "struct inode *")
           entry_point_call += "whoop_inode, ";
         else if (*j == "struct file *")
