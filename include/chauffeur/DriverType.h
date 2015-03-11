@@ -13,7 +13,8 @@ namespace chauffeur
     TEST_DRIVER,
     CHAR_DRIVER,
     BLOCK_DRIVER,
-    NETWORK_DRIVER
+    NETWORK_DRIVER,
+    FILE_SYSTEM
   };
 }
 

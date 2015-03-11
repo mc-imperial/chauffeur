@@ -91,6 +91,7 @@ add_executable(chauffeur
   lib/chauffeur/CharDriverRewriteVisitor.cpp
   lib/chauffeur/BlockDriverRewriteVisitor.cpp
   lib/chauffeur/NetworkDriverRewriteVisitor.cpp
+  lib/chauffeur/FileSystemRewriteVisitor.cpp
   lib/chauffeur/TestDriverRewriteVisitor.cpp
   lib/chauffeur/DriverInfo.cpp)
 

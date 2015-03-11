@@ -101,7 +101,7 @@ namespace chauffeur
     if (device_str.empty())
       return;
 
-    string shared_struct_str = GetSharedStructStrInFunctionBody(body);
+    string shared_struct_str = GetSharedStructStrInFunctionBody(body, true);
     if (shared_struct_str.empty())
       return;
 
@@ -202,7 +202,7 @@ namespace chauffeur
     RW.InsertText(loc, "}", true, true);
   }
 
-  string NetworkDriverRewriteVisitor::GetSharedStructStrInFunctionBody(Stmt *body)
+  string NetworkDriverRewriteVisitor::GetSharedStructStrInFunctionBody(Stmt *body, bool doLog)
   {
     string shared_struct_str = "";
 
@@ -231,7 +231,18 @@ namespace chauffeur
         CallExpr *callExpr = cast<CallExpr>(varDecl->getInit());
         shared_struct_str = GetSharedStructStr(callExpr);
         if (shared_struct_str != "")
+        {
+          if (doLog)
+          {
+            Expr *callee = callExpr->getCallee();
+            ImplicitCastExpr *calleeImplExpr = cast<ImplicitCastExpr>(callee);
+            DeclRefExpr *calleeDeclExpr = cast<DeclRefExpr>(calleeImplExpr->getSubExpr());
+            DI->getInstance().AddSharedStructInformation("whoop_network_shared_struct",
+              calleeDeclExpr->getNameInfo().getAsString());
+          }
+
           break;
+        }
       }
       else if (isa<BinaryOperator>(*i))
       {
@@ -242,7 +253,18 @@ namespace chauffeur
         CallExpr *callExpr = cast<CallExpr>(binOp->getRHS());
         shared_struct_str = GetSharedStructStr(callExpr);
         if (shared_struct_str != "")
+        {
+          if (doLog)
+          {
+            Expr *callee = callExpr->getCallee();
+            ImplicitCastExpr *calleeImplExpr = cast<ImplicitCastExpr>(callee);
+            DeclRefExpr *calleeDeclExpr = cast<DeclRefExpr>(calleeImplExpr->getSubExpr());
+            DI->getInstance().AddSharedStructInformation("whoop_network_shared_struct",
+              calleeDeclExpr->getNameInfo().getAsString());
+          }
+
           break;
+        }
       }
     }
 
@@ -265,7 +287,7 @@ namespace chauffeur
     Stmt *body = callExpr->getCalleeDecl()->getBody();
 
     if (calleeDeclExpr->getNameInfo().getAsString() != "alloc_etherdev")
-      shared_struct_str = GetSharedStructStrInFunctionBody(body);
+      shared_struct_str = GetSharedStructStrInFunctionBody(body, false);
     if (calleeDeclExpr->getNameInfo().getAsString() != "alloc_etherdev")
       return shared_struct_str;
 

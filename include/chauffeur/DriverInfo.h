@@ -39,6 +39,7 @@ namespace chauffeur
 
     void AddEntryPoint(string entrypoint, list<string> params);
 		void AddEntryPointPair(string type, string funcname, string entrypoint);
+    void AddSharedStructInformation(string type, string funcname);
 
     void AddFunctionPointerInformation(string fp, string type, string info);
     void AddFunctionPointerCallInformation(string fp, string type, string info);

@@ -11,12 +11,10 @@ namespace chauffeur
   void ParseDriverConsumer::HandleTranslationUnit(ASTContext &Context)
   {
     FEPV->TraverseDecl(Context.getTranslationUnitDecl());
-    DI->getInstance().PrintDriverInfo();
     FFPV->TraverseDecl(Context.getTranslationUnitDecl());
     FFPCV->TraverseDecl(Context.getTranslationUnitDecl());
     MFPV->TraverseDecl(Context.getTranslationUnitDecl());
     MFPV->AnalyseMacros();
-    DI->getInstance().PrintFunctionPointerInfo();
 
     if (DI->getInstance().GetType() == CHAR_DRIVER)
     {
@@ -33,10 +31,18 @@ namespace chauffeur
       NDRV->TraverseDecl(Context.getTranslationUnitDecl());
       NDRV->Finalise();
     }
+    else if (DI->getInstance().GetType() == FILE_SYSTEM)
+    {
+      FSRV->TraverseDecl(Context.getTranslationUnitDecl());
+      FSRV->Finalise();
+    }
     else if (DI->getInstance().GetType() == TEST_DRIVER)
     {
       TDRV->TraverseDecl(Context.getTranslationUnitDecl());
       TDRV->Finalise();
     }
+
+    DI->getInstance().PrintDriverInfo();
+    DI->getInstance().PrintFunctionPointerInfo();
   }
 }

@@ -30,6 +30,11 @@ namespace chauffeur
 		entry_point_pairs[type][funcname] = entrypoint;
 	}
 
+	void DriverInfo::AddSharedStructInformation(string type, string funcname)
+	{
+		entry_point_pairs[type][""] = funcname;
+	}
+
 	void DriverInfo::AddFunctionPointerInformation(string fp, string type, string info)
 	{
 		map<string, string> fpInfo;
@@ -114,8 +119,12 @@ namespace chauffeur
 
 	bool DriverInfo::IsDriverModule(string name)
 	{
-		if (name == "pci_driver" || name == "file_operations" || name == "block_device_operations" ||
-			name == "dev_pm_ops" || name == "net_device_ops" || name == "ethtool_ops" ||
+		if (name == "pci_driver" ||
+			name == "file_operations" || name == "block_device_operations" ||
+			name == "dev_pm_ops" ||
+			name == "net_device_ops" || name == "ethtool_ops" ||
+			name == "file_system_type" || name == "inode_operations" ||
+			name == "address_space_operations" || name == "super_operations" ||
 			name == "test_driver")
 		{
 			return true;

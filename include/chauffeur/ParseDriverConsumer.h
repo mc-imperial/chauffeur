@@ -13,6 +13,7 @@
 #include "chauffeur/CharDriverRewriteVisitor.h"
 #include "chauffeur/BlockDriverRewriteVisitor.h"
 #include "chauffeur/NetworkDriverRewriteVisitor.h"
+#include "chauffeur/FileSystemRewriteVisitor.h"
 #include "chauffeur/TestDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTConsumer.h"
@@ -31,6 +32,7 @@ namespace chauffeur
     CharDriverRewriteVisitor *CDRV;
     BlockDriverRewriteVisitor *BDRV;
 		NetworkDriverRewriteVisitor *NDRV;
+    FileSystemRewriteVisitor *FSRV;
     TestDriverRewriteVisitor *TDRV;
 
 	public:
@@ -42,6 +44,7 @@ namespace chauffeur
         CDRV(new CharDriverRewriteVisitor(CI, doInline)),
         BDRV(new BlockDriverRewriteVisitor(CI, doInline)),
         NDRV(new NetworkDriverRewriteVisitor(CI, doInline)),
+        FSRV(new FileSystemRewriteVisitor(CI, doInline)),
         TDRV(new TestDriverRewriteVisitor(CI, doInline))
 		{}
 

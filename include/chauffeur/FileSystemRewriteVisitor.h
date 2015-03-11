@@ -3,8 +3,8 @@
 // This file is distributed under the MIT License. See LICENSE for details.
 //
 
-#ifndef NETWORKDRIVERREWRITEVISITOR_H
-#define NETWORKDRIVERREWRITEVISITOR_H
+#ifndef FILESYSTEMREWRITEVISITOR_H
+#define FILESYSTEMREWRITEVISITOR_H
 
 #include "chauffeur/DriverInfo.h"
 #include "chauffeur/AbstractDriverRewriteVisitor.h"
@@ -18,24 +18,23 @@ namespace chauffeur
 {
   using namespace clang;
 
-	class NetworkDriverRewriteVisitor : public AbstractDriverRewriteVisitor
+	class FileSystemRewriteVisitor : public AbstractDriverRewriteVisitor
 	{
 	protected:
     virtual void InstrumentEntryPoints(FunctionDecl* FD, string fdFile);
     virtual void CreateCheckerFunction(FunctionDecl* FD, string fdFile);
 
-    virtual string GetSharedStructStrInFunctionBody(Stmt *body, bool doLog);
     virtual string GetSharedStructStr(CallExpr *callExpr);
 
 	public:
-	  explicit NetworkDriverRewriteVisitor(CompilerInstance *CI, bool doInline)
+	  explicit FileSystemRewriteVisitor(CompilerInstance *CI, bool doInline)
       : AbstractDriverRewriteVisitor(CI, doInline)
     {
 
     }
 
-    virtual ~NetworkDriverRewriteVisitor() {}
+    virtual ~FileSystemRewriteVisitor() {}
 	};
 }
 
-#endif // NETWORKDRIVERREWRITEVISITOR_H
+#endif // FILESYSTEMREWRITEVISITOR_H

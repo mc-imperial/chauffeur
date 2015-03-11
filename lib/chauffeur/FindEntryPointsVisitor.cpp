@@ -64,6 +64,8 @@ namespace chauffeur
       DI->getInstance().SetType(BLOCK_DRIVER);
     else if (baseRecDecl->getNameAsString() == "net_device_ops")
       DI->getInstance().SetType(NETWORK_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "file_system_type")
+      DI->getInstance().SetType(FILE_SYSTEM);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
 
@@ -137,6 +139,28 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
+          /* super_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "alloc_inode" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "destroy_inode" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "write_inode" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "evict_inode" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "put_super" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "statfs" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "remount_fs" ||
+          /* address_space_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "readpage" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "writepage" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "write_begin" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "write_end" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "minix_bmap" ||
+          /* inode_operations */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "readlink" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "follow_link" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "put_link" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "getattr" ||
+          /* file_system_type */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "mount" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "kill_sb" ||
           /* test_driver */
           desExpr->getDesignator(0)->getFieldName()->getName() == "ep1" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "ep2" ||
@@ -161,7 +185,7 @@ namespace chauffeur
         if (!isa<FunctionDecl>(value))
           continue;
 
-        if (funcname == "probe")
+        if (funcname == "probe" || funcname == "mount")
         {
           DI->getInstance().SetInitFunction(declExpr->getNameInfo().getName().getAsString());
         }
