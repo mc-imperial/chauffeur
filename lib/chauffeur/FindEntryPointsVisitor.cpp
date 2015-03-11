@@ -71,7 +71,7 @@ namespace chauffeur
     {
       return true;
     }
-    
+
     InitListExpr *initListExpr = cast<InitListExpr>(varDecl->getInit())->getSyntacticForm();
 
     for (auto range = initListExpr->children(); range; ++range)
@@ -146,7 +146,7 @@ namespace chauffeur
         funcname = desExpr->getDesignator(0)->getFieldName()->getName();
       else
         continue;
-      llvm::errs() << "test 2" << "\n";
+
       Expr *expr = cast<ImplicitCastExpr>(desExpr->getInit())->getSubExpr();
       while (!isa<DeclRefExpr>(expr))
         expr = cast<ImplicitCastExpr>(expr)->getSubExpr();
