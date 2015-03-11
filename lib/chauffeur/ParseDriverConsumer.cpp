@@ -12,13 +12,11 @@ namespace chauffeur
   {
     FEPV->TraverseDecl(Context.getTranslationUnitDecl());
     DI->getInstance().PrintDriverInfo();
-
     FFPV->TraverseDecl(Context.getTranslationUnitDecl());
     FFPCV->TraverseDecl(Context.getTranslationUnitDecl());
     MFPV->TraverseDecl(Context.getTranslationUnitDecl());
     MFPV->AnalyseMacros();
     DI->getInstance().PrintFunctionPointerInfo();
-
 
     if (DI->getInstance().GetType() == CHAR_DRIVER)
     {
