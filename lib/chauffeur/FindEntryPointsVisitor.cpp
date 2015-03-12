@@ -185,7 +185,7 @@ namespace chauffeur
         if (!isa<FunctionDecl>(value))
           continue;
 
-        if (funcname == "probe" || funcname == "mount")
+        if (funcname == "probe")
         {
           DI->getInstance().SetInitFunction(declExpr->getNameInfo().getName().getAsString());
         }
