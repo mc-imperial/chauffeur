@@ -51,6 +51,9 @@ namespace chauffeur
     RW.InsertText(loc, "\tstruct sk_buff *whoop_skb = (struct sk_buff *) malloc(sizeof(struct sk_buff *));\n", true, true);
     RW.InsertText(loc, "\tdata_exchange_cb_t whoop_de;\n\n", true, true);
 
+    RW.InsertText(loc, "\tint whoop_int = __SMACK_nondet();\n", true, true);
+    RW.InsertText(loc, "\t__SMACK_code(\"assume @ >= @;\", whoop_int, 0);\n\n", true, true);
+
     auto entry_points = DI->getInstance().GetEntryPoints();
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
     {
@@ -76,19 +79,19 @@ namespace chauffeur
         else if (*j == "data_exchange_cb_t")
           entry_point_call += "whoop_de, ";
         else if (*j == "size_t")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "int")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "unsigned int")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "long")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "unsigned long")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "u32")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "u8")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else
           entry_point_call += *j + ", ";
       }

@@ -61,7 +61,10 @@ namespace chauffeur
     RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t *));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
     RW.InsertText(loc, "\tconst void **whoop_vbuf = (void **) malloc(sizeof(char *) * 32);\n", true, true);
-    RW.InsertText(loc, "\tconst int *whoop_int = (int *) malloc(sizeof(int *));\n\n", true, true);
+    RW.InsertText(loc, "\tconst int *whoop_int_ptr = (int *) malloc(sizeof(int *));\n\n", true, true);
+
+    RW.InsertText(loc, "\tint whoop_int = __SMACK_nondet();\n", true, true);
+    RW.InsertText(loc, "\t__SMACK_code(\"assume @ >= @;\", whoop_int, 0);\n\n", true, true);
 
     auto entry_points = DI->getInstance().GetEntryPoints();
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
@@ -114,19 +117,19 @@ namespace chauffeur
         else if (*j == "const char *")
           entry_point_call += "whoop_buf, ";
         else if (*j == "size_t")
-          entry_point_call += "0, ";
-        else if (*j == "int *")
           entry_point_call += "whoop_int, ";
+        else if (*j == "int *")
+          entry_point_call += "whoop_int_ptr, ";
         else if (*j == "int")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "unsigned int")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "long")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "unsigned long")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "u32")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else
           entry_point_call += *j + ", ";
       }

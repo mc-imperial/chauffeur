@@ -145,6 +145,9 @@ namespace chauffeur
     RW.InsertText(loc, "\tstruct ethtool_drvinfo *whoop_ethtooldrvinfo = (struct ethtool_drvinfo *) malloc(sizeof(struct ethtool_drvinfo *));\n", true, true);
     RW.InsertText(loc, "\tnetdev_features_t whoop_netdevfeat = NETIF_F_RXCSUM;\n\n", true, true);
 
+    RW.InsertText(loc, "\tint whoop_int = __SMACK_nondet();\n", true, true);
+    RW.InsertText(loc, "\t__SMACK_code(\"assume @ >= @;\", whoop_int, 0);\n\n", true, true);
+
     auto entry_points = DI->getInstance().GetEntryPoints();
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
     {
@@ -187,9 +190,9 @@ namespace chauffeur
         else if (*j == "netdev_features_t")
           entry_point_call += "whoop_netdevfeat, ";
         else if (*j == "int")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else if (*j == "u32")
-          entry_point_call += "0, ";
+          entry_point_call += "whoop_int, ";
         else
           entry_point_call += *j + ", ";
       }
