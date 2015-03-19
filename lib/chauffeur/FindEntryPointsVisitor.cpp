@@ -60,7 +60,8 @@ namespace chauffeur
 
     if (baseRecDecl->getNameAsString() == "file_operations")
       DI->getInstance().SetType(CHAR_DRIVER);
-    else if (baseRecDecl->getNameAsString() == "block_device_operations")
+    else if (baseRecDecl->getNameAsString() == "block_device_operations" ||
+        baseRecDecl->getNameAsString() == "ps3_system_bus_driver")
       DI->getInstance().SetType(BLOCK_DRIVER);
     else if (baseRecDecl->getNameAsString() == "net_device_ops")
       DI->getInstance().SetType(NETWORK_DRIVER);
@@ -99,6 +100,7 @@ namespace chauffeur
           /* block_device_operations */
           desExpr->getDesignator(0)->getFieldName()->getName() == "getgeo" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "revalidate_disk" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "check_events" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "media_changed" ||
           /* dev_pm_ops */
           desExpr->getDesignator(0)->getFieldName()->getName() == "suspend" ||
