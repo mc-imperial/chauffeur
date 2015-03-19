@@ -67,6 +67,8 @@ namespace chauffeur
       DI->getInstance().SetType(NETWORK_DRIVER);
     else if (baseRecDecl->getNameAsString() == "file_system_type")
       DI->getInstance().SetType(FILE_SYSTEM);
+    else if (baseRecDecl->getNameAsString() == "nfc_ops")
+      DI->getInstance().SetType(NFC_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
 
@@ -141,6 +143,17 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
+          /* nfc_ops */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "dev_up" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "dev_down" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "dep_link_up" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "dep_link_down" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "start_poll" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "stop_poll" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "activate_target" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "deactivate_target" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "im_transceive" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "tm_send" ||
           /* super_operations */
           desExpr->getDesignator(0)->getFieldName()->getName() == "alloc_inode" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "destroy_inode" ||

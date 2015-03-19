@@ -36,6 +36,11 @@ namespace chauffeur
       FSRV->TraverseDecl(Context.getTranslationUnitDecl());
       FSRV->Finalise();
     }
+    else if (DI->getInstance().GetType() == NFC_DRIVER)
+    {
+      NFCDRV->TraverseDecl(Context.getTranslationUnitDecl());
+      NFCDRV->Finalise();
+    }
     else if (DI->getInstance().GetType() == TEST_DRIVER)
     {
       TDRV->TraverseDecl(Context.getTranslationUnitDecl());
