@@ -119,7 +119,7 @@ namespace chauffeur
 
 	bool DriverInfo::IsDriverModule(string name)
 	{
-		if (name == "pci_driver" ||
+		if (name == "pci_driver" || name == "cx_drv" ||
 			name == "file_operations" || name == "block_device_operations" ||
 			name == "dev_pm_ops" ||
 			name == "file_system_type" || name == "inode_operations" ||
