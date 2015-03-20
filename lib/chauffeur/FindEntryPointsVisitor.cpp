@@ -71,7 +71,7 @@ namespace chauffeur
       DI->getInstance().SetType(NFC_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
-
+    
     if (varDecl->getInit() == NULL)
     {
       return true;

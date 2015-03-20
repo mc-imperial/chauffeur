@@ -93,7 +93,8 @@ namespace chauffeur
       DesignatedInitExpr *desExpr = cast<DesignatedInitExpr>(*range);
       if (desExpr->size() > 1)
         continue;
-
+      if (desExpr->getDesignator(0) == NULL)
+        continue;
       if (desExpr->getDesignator(0)->isArrayDesignator())
       {
         if(!isa<InitListExpr>(desExpr->getSubExpr(0)))
