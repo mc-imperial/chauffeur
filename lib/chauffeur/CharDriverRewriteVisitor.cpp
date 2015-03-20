@@ -51,6 +51,7 @@ namespace chauffeur
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
     RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t *));\n", true, true);
     RW.InsertText(loc, "\tstruct poll_table *whoop_poll_table = (struct poll_table *) malloc(sizeof(struct poll_table *));\n", true, true);
+    RW.InsertText(loc, "\tstruct platform_device *whoop_platform_device = (struct platform_device *) malloc(sizeof(struct platform_device *));\n", true, true);
     RW.InsertText(loc, "\tstruct vm_area_struct *whoop_vm_area_struct = (struct vm_area_struct *) malloc(sizeof(struct vm_area_struct *));\n", true, true);
     RW.InsertText(loc, "\tstruct cx_dev *whoop_cx_dev = (struct cx_dev *) malloc(sizeof(struct cx_dev *));\n\n", true, true);
 
@@ -87,6 +88,8 @@ namespace chauffeur
           entry_point_call += "&whoop_loff_t, ";
         else if (*j == "poll_table *")
           entry_point_call += "whoop_poll_table, ";
+        else if (*j == "struct platform_device *")
+          entry_point_call += "whoop_platform_device, ";
         else if (*j == "struct vm_area_struct *")
           entry_point_call += "whoop_vm_area_struct, ";
         else if (*j == "struct cx_dev *")
