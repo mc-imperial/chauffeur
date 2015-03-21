@@ -152,6 +152,13 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
+          /* nsc_gpio_ops */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "gpio_config" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "gpio_dump" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "gpio_get" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "gpio_set" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "gpio_change" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "gpio_current" ||
           /* drm_i2c_encoder_driver */
           desExpr->getDesignator(0)->getFieldName()->getName() == "encoder_init" ||
           /* drm_encoder_slave_funcs */

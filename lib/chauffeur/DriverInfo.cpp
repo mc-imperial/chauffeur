@@ -128,6 +128,7 @@ namespace chauffeur
 			name == "net_device_ops" || name == "ethtool_ops" ||
 			name == "nfc_ops" ||
 			name == "ps3_system_bus_driver" ||
+			name == "nsc_gpio_ops" ||
 			name == "drm_i2c_encoder_driver" ||
 			name == "drm_encoder_slave_funcs" ||
 			name == "drm_encoder_helper_funcs" ||
