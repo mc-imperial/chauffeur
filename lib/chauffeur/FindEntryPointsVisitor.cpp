@@ -67,6 +67,8 @@ namespace chauffeur
       DI->getInstance().SetType(NETWORK_DRIVER);
     else if (baseRecDecl->getNameAsString() == "file_system_type")
       DI->getInstance().SetType(FILE_SYSTEM);
+    else if (baseRecDecl->getNameAsString() == "drm_i2c_encoder_driver")
+      DI->getInstance().SetType(GPU_DRIVER);
     else if (baseRecDecl->getNameAsString() == "nfc_ops")
       DI->getInstance().SetType(NFC_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
@@ -150,6 +152,24 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_sset_count" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ethtool_stats" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_ts_info" ||
+          /* drm_i2c_encoder_driver */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "encoder_init" ||
+          /* drm_encoder_slave_funcs */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "set_config" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "destroy" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "dpms" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "save" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "restore" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "mode_fixup" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "mode_valid" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "mode_set" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "detect" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_modes" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "create_resources" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "set_property" ||
+          /* drm_encoder_helper_funcs */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "prepare" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "commit" ||
           /* nfc_ops */
           desExpr->getDesignator(0)->getFieldName()->getName() == "dev_up" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "dev_down" ||

@@ -128,6 +128,12 @@ namespace chauffeur
 			name == "net_device_ops" || name == "ethtool_ops" ||
 			name == "nfc_ops" ||
 			name == "ps3_system_bus_driver" ||
+			name == "drm_i2c_encoder_driver" ||
+			name == "drm_encoder_slave_funcs" ||
+			name == "drm_encoder_helper_funcs" ||
+			name == "drm_encoder_funcs" ||
+			name == "drm_connector_helper_funcs" ||
+			name == "ps3_system_btda998x_opsus_driver" ||
 			name == "test_driver")
 		{
 			return true;

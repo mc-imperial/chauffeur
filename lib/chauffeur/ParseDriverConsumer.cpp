@@ -36,6 +36,11 @@ namespace chauffeur
       FSRV->TraverseDecl(Context.getTranslationUnitDecl());
       FSRV->Finalise();
     }
+    else if (DI->getInstance().GetType() == GPU_DRIVER)
+    {
+      GPUDRV->TraverseDecl(Context.getTranslationUnitDecl());
+      GPUDRV->Finalise();
+    }
     else if (DI->getInstance().GetType() == NFC_DRIVER)
     {
       NFCDRV->TraverseDecl(Context.getTranslationUnitDecl());
