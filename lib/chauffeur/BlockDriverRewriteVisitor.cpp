@@ -47,6 +47,9 @@ namespace chauffeur
     RW.InsertText(loc, "{\n", true, true);
 
     RW.InsertText(loc, "\tstruct block_device *whoop_bdev = (struct block_device *) malloc(sizeof(struct block_device *));\n", true, true);
+    RW.InsertText(loc, "\tstruct platform_device *whoop_platform_device = (struct platform_device *) malloc(sizeof(struct platform_device *));\n", true, true);
+    RW.InsertText(loc, "\tstruct cdrom_device_info *whoop_cdrom_device_info = (struct cdrom_device_info *) malloc(sizeof(struct cdrom_device_info *));\n", true, true);
+    RW.InsertText(loc, "\tstruct cdrom_multisession *whoop_cdrom_multisession = (struct cdrom_multisession *) malloc(sizeof(struct cdrom_multisession *));\n", true, true);
     RW.InsertText(loc, "\tstruct ps3_system_bus_device *whoop_ps3_system_bus_device = (struct ps3_system_bus_device *) malloc(sizeof(struct ps3_system_bus_device *));\n", true, true);
     RW.InsertText(loc, "\tstruct hd_geometry *whoop_geo = (struct hd_geometry *) malloc(sizeof(struct hd_geometry *));\n", true, true);
     RW.InsertText(loc, "\tstruct inode *whoop_inode = (struct inode *) malloc(sizeof(struct inode *));\n", true, true);
@@ -75,6 +78,12 @@ namespace chauffeur
           entry_point_call += "NULL, ";
         else if (*j == "struct block_device *")
           entry_point_call += "whoop_bdev, ";
+        else if (*j == "struct platform_device *")
+          entry_point_call += "whoop_platform_device, ";
+        else if (*j == "struct cdrom_device_info *")
+          entry_point_call += "whoop_cdrom_device_info, ";
+        else if (*j == "struct cdrom_multisession *")
+          entry_point_call += "whoop_cdrom_multisession, ";
         else if (*j == "struct ps3_system_bus_device *")
           entry_point_call += "whoop_ps3_system_bus_device, ";
         else if (*j == "struct hd_geometry *")
@@ -100,6 +109,8 @@ namespace chauffeur
         else if (*j == "unsigned long")
           entry_point_call += "whoop_int, ";
         else if (*j == "u32")
+          entry_point_call += "whoop_int, ";
+        else if (*j == "fmode_t")
           entry_point_call += "whoop_int, ";
         else
           entry_point_call += *j + ", ";

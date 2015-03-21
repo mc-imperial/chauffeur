@@ -71,7 +71,7 @@ namespace chauffeur
       DI->getInstance().SetType(NFC_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
-    
+
     if (varDecl->getInit() == NULL)
     {
       return true;
@@ -105,6 +105,12 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "revalidate_disk" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "check_events" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "media_changed" ||
+          /* cdrom_device_ops */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "drive_status" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "check_events" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_last_session" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "reset" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "audio_ioctl" ||
           /* dev_pm_ops */
           desExpr->getDesignator(0)->getFieldName()->getName() == "suspend" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "resume" ||
