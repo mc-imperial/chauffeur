@@ -71,7 +71,8 @@ namespace chauffeur
       DI->getInstance().SetType(GPU_DRIVER);
     else if (baseRecDecl->getNameAsString() == "nfc_ops")
       DI->getInstance().SetType(NFC_DRIVER);
-    else if (baseRecDecl->getNameAsString() == "usb_serial_driver")
+    else if (baseRecDecl->getNameAsString() == "usb_serial_driver" ||
+        baseRecDecl->getNameAsString() == "usb_driver")
       DI->getInstance().SetType(USB_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
@@ -201,6 +202,11 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "tiocmiwait" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "get_icount" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "set_termios" ||
+          /* usb_driver */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "disconnect" ||
+          /* backlight_ops */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_brightness" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "update_status" ||
           /* super_operations */
           desExpr->getDesignator(0)->getFieldName()->getName() == "alloc_inode" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "destroy_inode" ||

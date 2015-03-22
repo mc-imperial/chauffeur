@@ -51,6 +51,7 @@ namespace chauffeur
     RW.InsertText(loc, "\tstruct tty_struct *whoop_tty_struct = (struct tty_struct *) malloc(sizeof(struct tty_struct *));\n", true, true);
     RW.InsertText(loc, "\tstruct usb_serial *whoop_usb_serial = (struct usb_serial *) malloc(sizeof(struct usb_serial *));\n", true, true);
     RW.InsertText(loc, "\tstruct usb_serial_port *whoop_usb_serial_port = (struct usb_serial_port *) malloc(sizeof(struct usb_serial_port *));\n", true, true);
+    RW.InsertText(loc, "\tstruct usb_interface *whoop_usb_interface = (struct usb_interface *) malloc(sizeof(struct usb_interface *));\n", true, true);
     RW.InsertText(loc, "\tstruct ktermios *whoop_ktermios = (struct ktermios *) malloc(sizeof(struct ktermios *));\n", true, true);
     RW.InsertText(loc, "\tstruct urb *whoop_urb = (struct urb *) malloc(sizeof(struct urb *));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n\n", true, true);
@@ -80,6 +81,8 @@ namespace chauffeur
           entry_point_call += "whoop_usb_serial, ";
         else if (*j == "struct usb_serial_port *")
           entry_point_call += "whoop_usb_serial_port, ";
+        else if (*j == "struct usb_interface *")
+          entry_point_call += "whoop_usb_interface, ";
         else if (*j == "struct urb *")
           entry_point_call += "whoop_ktermios, ";
         else if (*j == "struct ktermios *")
