@@ -12,6 +12,8 @@ namespace chauffeur
 
   void CharDriverRewriteVisitor::InstrumentEntryPoints(FunctionDecl* funcDecl, string fdFile)
   {
+    if (funcDecl->getStorageClass() == SC_Static)
+      RW.RemoveText(funcDecl->getInnerLocStart(), 7);
     return;
   }
 
@@ -54,6 +56,7 @@ namespace chauffeur
       RW.InsertText(loc, "\tstruct file *whoop_file$" + std::to_string(i) + " = (struct file *) malloc(sizeof(struct file *));\n", true, true);
     }
 
+    RW.InsertText(loc, "\tstruct pci_dev *whoop_pci_dev = (struct pci_dev *) malloc(sizeof(struct pci_dev *));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
     RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t *));\n", true, true);
     RW.InsertText(loc, "\tstruct poll_table *whoop_poll_table = (struct poll_table *) malloc(sizeof(struct poll_table *));\n", true, true);
@@ -80,6 +83,8 @@ namespace chauffeur
           entry_point_call += "NULL, ";
         else if (*j == "u8 *")
           entry_point_call += "NULL, ";
+        else if (*j == "struct pci_dev *")
+          entry_point_call += "whoop_pci_dev, ";
         else if (*j == "struct inode *")
           entry_point_call += "whoop_inode$" + std::to_string(counter) + ", ";
         else if (*j == "struct file *")

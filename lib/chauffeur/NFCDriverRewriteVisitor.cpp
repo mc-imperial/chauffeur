@@ -12,6 +12,8 @@ namespace chauffeur
 
   void NFCDriverRewriteVisitor::InstrumentEntryPoints(FunctionDecl* funcDecl, string fdFile)
   {
+    if (funcDecl->getStorageClass() == SC_Static)
+      RW.RemoveText(funcDecl->getInnerLocStart(), 7);
     return;
   }
 

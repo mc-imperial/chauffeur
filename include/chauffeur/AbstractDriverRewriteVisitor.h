@@ -19,6 +19,9 @@ namespace chauffeur
 
 	class AbstractDriverRewriteVisitor : public RecursiveASTVisitor<AbstractDriverRewriteVisitor>
 	{
+  private:
+    bool CheckerExists;
+    
 	protected:
 		ASTContext *Context;
 		Rewriter RW;
@@ -29,6 +32,7 @@ namespace chauffeur
     : Context(&(CI->getASTContext()))
     {
       DoInline = doInline;
+      CheckerExists = false;
       RW.setSourceMgr(Context->getSourceManager(), Context->getLangOpts());
     }
 

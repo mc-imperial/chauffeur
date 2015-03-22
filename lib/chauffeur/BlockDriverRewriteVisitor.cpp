@@ -12,6 +12,8 @@ namespace chauffeur
 
   void BlockDriverRewriteVisitor::InstrumentEntryPoints(FunctionDecl* funcDecl, string fdFile)
   {
+    if (funcDecl->getStorageClass() == SC_Static)
+      RW.RemoveText(funcDecl->getInnerLocStart(), 7);
     return;
   }
 
@@ -46,6 +48,7 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
+    RW.InsertText(loc, "\tstruct pci_dev *whoop_pci_dev = (struct pci_dev *) malloc(sizeof(struct pci_dev *));\n", true, true);
     RW.InsertText(loc, "\tstruct block_device *whoop_bdev = (struct block_device *) malloc(sizeof(struct block_device *));\n", true, true);
     RW.InsertText(loc, "\tstruct platform_device *whoop_platform_device = (struct platform_device *) malloc(sizeof(struct platform_device *));\n", true, true);
     RW.InsertText(loc, "\tstruct cdrom_device_info *whoop_cdrom_device_info = (struct cdrom_device_info *) malloc(sizeof(struct cdrom_device_info *));\n", true, true);
@@ -76,6 +79,8 @@ namespace chauffeur
           entry_point_call += "NULL, ";
         else if (*j == "u8 *")
           entry_point_call += "NULL, ";
+        else if (*j == "struct pci_dev *")
+          entry_point_call += "whoop_pci_dev, ";
         else if (*j == "struct block_device *")
           entry_point_call += "whoop_bdev, ";
         else if (*j == "struct platform_device *")

@@ -26,9 +26,10 @@ namespace chauffeur
       InstrumentEntryPoints(funcDecl, fdFile);
     }
 
-    if (funcDecl->getNameInfo().getName().getAsString() == DI->getInstance().GetInitFunction())
+    if (!CheckerExists && funcDecl->getNameInfo().getName().getAsString() == DI->getInstance().GetInitFunction())
     {
       CreateCheckerFunction(funcDecl, fdFile);
+      CheckerExists = true;
     }
 
     return true;
