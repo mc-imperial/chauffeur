@@ -48,9 +48,9 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
-    RW.InsertText(loc, "\tstruct nfc_dev *whoop_nfc_dev = (struct nfc_dev *) malloc(sizeof(struct nfc_dev *));\n", true, true);
-    RW.InsertText(loc, "\tstruct nfc_target *whoop_nfc_target = (struct nfc_target *) malloc(sizeof(struct nfc_target *));\n", true, true);
-    RW.InsertText(loc, "\tstruct sk_buff *whoop_skb = (struct sk_buff *) malloc(sizeof(struct sk_buff *));\n", true, true);
+    RW.InsertText(loc, "\tstruct nfc_dev *whoop_nfc_dev = (struct nfc_dev *) malloc(sizeof(struct nfc_dev));\n", true, true);
+    RW.InsertText(loc, "\tstruct nfc_target *whoop_nfc_target = (struct nfc_target *) malloc(sizeof(struct nfc_target));\n", true, true);
+    RW.InsertText(loc, "\tstruct sk_buff *whoop_skb = (struct sk_buff *) malloc(sizeof(struct sk_buff));\n", true, true);
     RW.InsertText(loc, "\tdata_exchange_cb_t whoop_de;\n\n", true, true);
 
     RW.InsertText(loc, "\tint whoop_int = __SMACK_nondet();\n", true, true);
