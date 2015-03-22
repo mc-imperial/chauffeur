@@ -59,8 +59,9 @@ namespace chauffeur
     RW.InsertText(loc, "\tstruct address_space *whoop_address_space = (struct address_space *) malloc(sizeof(struct address_space));\n", true, true);
     RW.InsertText(loc, "\tstruct dentry *whoop_dentry = (struct dentry *) malloc(sizeof(struct dentry));\n", true, true);
     RW.InsertText(loc, "\tstruct kstatfs *whoop_kstatfs = (struct kstatfs *) malloc(sizeof(struct kstatfs));\n", true, true);
-    RW.InsertText(loc, "\tstruct kstat *whoop_kstat = (struct kstat *) malloc(sizeof(struct kstat));\n", true, true);
-    RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t));\n", true, true);
+    RW.InsertText(loc, "\tstruct kstat *whoop_kstat = (struct kstat *) malloc(sizeof(struct kstat));\n\n", true, true);
+
+    RW.InsertText(loc, "\tloff_t *whoop_loff_t = (loff_t *) malloc(sizeof(loff_t));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char));\n", true, true);
     RW.InsertText(loc, "\tconst void **whoop_vbuf = (void **) malloc(sizeof(char) * 32);\n", true, true);
     RW.InsertText(loc, "\tconst int *whoop_int_ptr = (int *) malloc(sizeof(int));\n\n", true, true);
