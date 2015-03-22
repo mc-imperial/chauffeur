@@ -46,8 +46,14 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
-    RW.InsertText(loc, "\tstruct inode *whoop_inode = (struct inode *) malloc(sizeof(struct inode *));\n", true, true);
-    RW.InsertText(loc, "\tstruct file *whoop_file = (struct file *) malloc(sizeof(struct file *));\n", true, true);
+    auto entry_points = DI->getInstance().GetEntryPoints();
+
+    for (unsigned long i = 0; i < entry_points.size(); i++)
+    {
+      RW.InsertText(loc, "\tstruct inode *whoop_inode$" + std::to_string(i) + " = (struct inode *) malloc(sizeof(struct inode *));\n", true, true);
+      RW.InsertText(loc, "\tstruct file *whoop_file$" + std::to_string(i) + " = (struct file *) malloc(sizeof(struct file *));\n", true, true);
+    }
+
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char *));\n", true, true);
     RW.InsertText(loc, "\tstruct loff_t *whoop_loff_t = (struct loff_t *) malloc(sizeof(struct loff_t *));\n", true, true);
     RW.InsertText(loc, "\tstruct poll_table *whoop_poll_table = (struct poll_table *) malloc(sizeof(struct poll_table *));\n", true, true);
@@ -58,7 +64,7 @@ namespace chauffeur
     RW.InsertText(loc, "\tint whoop_int = __SMACK_nondet();\n", true, true);
     RW.InsertText(loc, "\t__SMACK_code(\"assume @ >= @;\", whoop_int, 0);\n\n", true, true);
 
-    auto entry_points = DI->getInstance().GetEntryPoints();
+    int counter = 0;
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
     {
       string entry_point_call;
@@ -75,9 +81,9 @@ namespace chauffeur
         else if (*j == "u8 *")
           entry_point_call += "NULL, ";
         else if (*j == "struct inode *")
-          entry_point_call += "whoop_inode, ";
+          entry_point_call += "whoop_inode$" + std::to_string(counter) + ", ";
         else if (*j == "struct file *")
-          entry_point_call += "whoop_file, ";
+          entry_point_call += "whoop_file$" + std::to_string(counter) + ", ";
         else if (*j == "char *")
           entry_point_call += "whoop_buf, ";
         else if (*j == "const char *")
@@ -116,6 +122,7 @@ namespace chauffeur
       }
 
       RW.InsertText(loc, "\t" + entry_point_call + ");\n", true, true);
+      counter++;
     }
 
     RW.InsertText(loc, "}", true, true);

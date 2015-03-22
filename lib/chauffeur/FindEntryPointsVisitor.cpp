@@ -251,7 +251,7 @@ namespace chauffeur
           DI->getInstance().AddEntryPoint(declExpr->getNameInfo().getName().getAsString(), func_params);
         }
 
-        DI->getInstance().AddEntryPointPair(baseRecDecl->getNameAsString(),
+        DI->getInstance().AddEntryPointPair(baseRecDecl->getNameAsString() + "$" + varDecl->getNameAsString(),
           funcname, declExpr->getNameInfo().getName().getAsString());
       }
     }
