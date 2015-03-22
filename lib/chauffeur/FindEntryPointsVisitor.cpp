@@ -71,6 +71,8 @@ namespace chauffeur
       DI->getInstance().SetType(GPU_DRIVER);
     else if (baseRecDecl->getNameAsString() == "nfc_ops")
       DI->getInstance().SetType(NFC_DRIVER);
+    else if (baseRecDecl->getNameAsString() == "usb_serial_driver")
+      DI->getInstance().SetType(USB_DRIVER);
     else if (baseRecDecl->getNameAsString() == "test_driver")
       DI->getInstance().SetType(TEST_DRIVER);
 
@@ -188,6 +190,17 @@ namespace chauffeur
           desExpr->getDesignator(0)->getFieldName()->getName() == "deactivate_target" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "im_transceive" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "tm_send" ||
+          /* usb_serial_driver */
+          desExpr->getDesignator(0)->getFieldName()->getName() == "attach" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "port_probe" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "port_remove" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "dtr_rts" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "process_read_urb" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "tiocmget" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "tiocmset" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "tiocmiwait" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "get_icount" ||
+          desExpr->getDesignator(0)->getFieldName()->getName() == "set_termios" ||
           /* super_operations */
           desExpr->getDesignator(0)->getFieldName()->getName() == "alloc_inode" ||
           desExpr->getDesignator(0)->getFieldName()->getName() == "destroy_inode" ||
@@ -234,7 +247,7 @@ namespace chauffeur
         if (!isa<FunctionDecl>(value))
           continue;
 
-        if (funcname == "probe")
+        if (funcname == "probe" || funcname == "port_probe")
         {
           DI->getInstance().SetInitFunction(declExpr->getNameInfo().getName().getAsString());
         }

@@ -16,6 +16,7 @@
 #include "chauffeur/FileSystemRewriteVisitor.h"
 #include "chauffeur/GPUDriverRewriteVisitor.h"
 #include "chauffeur/NFCDriverRewriteVisitor.h"
+#include "chauffeur/USBDriverRewriteVisitor.h"
 #include "chauffeur/TestDriverRewriteVisitor.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTConsumer.h"
@@ -37,6 +38,7 @@ namespace chauffeur
     FileSystemRewriteVisitor *FSRV;
     GPUDriverRewriteVisitor *GPUDRV;
     NFCDriverRewriteVisitor *NFCDRV;
+    USBDriverRewriteVisitor *USBDRV;
     TestDriverRewriteVisitor *TDRV;
 
 	public:
@@ -51,6 +53,7 @@ namespace chauffeur
         FSRV(new FileSystemRewriteVisitor(CI, doInline)),
         GPUDRV(new GPUDriverRewriteVisitor(CI, doInline)),
         NFCDRV(new NFCDriverRewriteVisitor(CI, doInline)),
+        USBDRV(new USBDriverRewriteVisitor(CI, doInline)),
         TDRV(new TestDriverRewriteVisitor(CI, doInline))
 		{}
 

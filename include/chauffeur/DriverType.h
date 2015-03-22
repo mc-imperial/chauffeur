@@ -16,6 +16,7 @@ namespace chauffeur
     NETWORK_DRIVER,
     GPU_DRIVER,
     NFC_DRIVER,
+    USB_DRIVER,
     FILE_SYSTEM
   };
 }

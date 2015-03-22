@@ -127,6 +127,7 @@ namespace chauffeur
 			name == "address_space_operations" || name == "super_operations" ||
 			name == "net_device_ops" || name == "ethtool_ops" ||
 			name == "nfc_ops" ||
+			name == "usb_serial_driver" ||
 			name == "ps3_system_bus_driver" ||
 			name == "nsc_gpio_ops" ||
 			name == "drm_i2c_encoder_driver" ||
