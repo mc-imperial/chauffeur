@@ -48,22 +48,28 @@ namespace chauffeur
     RW.InsertText(loc, ")\n", true, true);
     RW.InsertText(loc, "{\n", true, true);
 
+    auto entry_points = DI->getInstance().GetEntryPoints();
+
+    for (unsigned long i = 0; i < entry_points.size(); i++)
+    {
+      RW.InsertText(loc, "\tstruct inode *whoop_inode$" + std::to_string(i) + " = (struct inode *) malloc(sizeof(struct inode));\n", true, true);
+      RW.InsertText(loc, "\tstruct file *whoop_file$" + std::to_string(i) + " = (struct file *) malloc(sizeof(struct file));\n", true, true);
+      RW.InsertText(loc, "\tstruct block_device *whoop_bdev$" + std::to_string(i) + " = (struct block_device *) malloc(sizeof(struct block_device));\n", true, true);
+    }
+
     RW.InsertText(loc, "\tstruct pci_dev *whoop_pci_dev = (struct pci_dev *) malloc(sizeof(struct pci_dev));\n", true, true);
-    RW.InsertText(loc, "\tstruct block_device *whoop_bdev = (struct block_device *) malloc(sizeof(struct block_device));\n", true, true);
     RW.InsertText(loc, "\tstruct platform_device *whoop_platform_device = (struct platform_device *) malloc(sizeof(struct platform_device));\n", true, true);
     RW.InsertText(loc, "\tstruct cdrom_device_info *whoop_cdrom_device_info = (struct cdrom_device_info *) malloc(sizeof(struct cdrom_device_info));\n", true, true);
     RW.InsertText(loc, "\tstruct cdrom_multisession *whoop_cdrom_multisession = (struct cdrom_multisession *) malloc(sizeof(struct cdrom_multisession));\n", true, true);
     RW.InsertText(loc, "\tstruct ps3_system_bus_device *whoop_ps3_system_bus_device = (struct ps3_system_bus_device *) malloc(sizeof(struct ps3_system_bus_device));\n", true, true);
     RW.InsertText(loc, "\tstruct hd_geometry *whoop_geo = (struct hd_geometry *) malloc(sizeof(struct hd_geometry));\n", true, true);
-    RW.InsertText(loc, "\tstruct inode *whoop_inode = (struct inode *) malloc(sizeof(struct inode));\n", true, true);
-    RW.InsertText(loc, "\tstruct file *whoop_file = (struct file *) malloc(sizeof(struct file));\n", true, true);
     RW.InsertText(loc, "\tconst char *whoop_buf = (char *) malloc(sizeof(char));\n", true, true);
     RW.InsertText(loc, "\tstruct gendisk *whoop_disk = (struct gendisk *) malloc(sizeof(struct gendisk));\n\n", true, true);
 
     RW.InsertText(loc, "\tint whoop_int = __SMACK_nondet();\n", true, true);
     RW.InsertText(loc, "\t__SMACK_code(\"assume @ >= @;\", whoop_int, 0);\n\n", true, true);
 
-    auto entry_points = DI->getInstance().GetEntryPoints();
+    int counter = 0;
     for(auto i = entry_points.rbegin(); i != entry_points.rend(); i++)
     {
       string entry_point_call;
@@ -82,7 +88,7 @@ namespace chauffeur
         else if (*j == "struct pci_dev *")
           entry_point_call += "whoop_pci_dev, ";
         else if (*j == "struct block_device *")
-          entry_point_call += "whoop_bdev, ";
+          entry_point_call += "whoop_bdev$" + std::to_string(counter) + ", ";
         else if (*j == "struct platform_device *")
           entry_point_call += "whoop_platform_device, ";
         else if (*j == "struct cdrom_device_info *")
@@ -94,9 +100,9 @@ namespace chauffeur
         else if (*j == "struct hd_geometry *")
           entry_point_call += "whoop_geo, ";
         else if (*j == "struct inode *")
-          entry_point_call += "whoop_inode, ";
+          entry_point_call += "whoop_inode$" + std::to_string(counter) + ", ";
         else if (*j == "struct file *")
-          entry_point_call += "whoop_file, ";
+          entry_point_call += "whoop_file$" + std::to_string(counter) + ", ";
         else if (*j == "struct gendisk *")
           entry_point_call += "whoop_disk, ";
         else if (*j == "char *")
@@ -127,6 +133,7 @@ namespace chauffeur
       }
 
       RW.InsertText(loc, "\t" + entry_point_call + ");\n", true, true);
+      counter++;
     }
 
     RW.InsertText(loc, "}", true, true);
