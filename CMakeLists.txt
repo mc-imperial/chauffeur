@@ -49,7 +49,11 @@ if (NOT WIN32 OR MSYS OR CYGWIN)
 	set(CLANG_LIBS -lclangTooling -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization
 					-lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers
 					-lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangRewrite
-					-lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic ${LLVM_LIBS} -lcurses -lz -ldl -lpthread)
+					-lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic ${LLVM_LIBS} -lcurses)
+          
+  if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(CLANG_LIBS ${CLANG_LIBS} -lz -ldl -lpthread)
+  endif()
 
 else ()
 	#   set(LLVM_SRC "" CACHE PATH "LLVM source directory")
