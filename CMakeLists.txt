@@ -50,7 +50,7 @@ if (NOT WIN32 OR MSYS OR CYGWIN)
 	set(CLANG_LIBS -lclangTooling -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization
 					-lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers
 					-lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewriteFrontend -lclangRewrite
-					-lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic ${LLVM_LIBS} -lcurses)
+					-lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic ${LLVM_LIBS} -lcurses -lz -ldl -lpthread)
 
 else ()
 	#   set(LLVM_SRC "" CACHE PATH "LLVM source directory")
