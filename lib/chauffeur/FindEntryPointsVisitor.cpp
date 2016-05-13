@@ -246,8 +246,18 @@ namespace chauffeur
 
       string fdFileWithExt = Context->getSourceManager().getFilename(declExpr->getDecl()->getLocation());
       string fdFile = fdFileWithExt.substr(0, fdFileWithExt.find_last_of("."));
-
-      if ((fdFile.size() > 0) && (fdFile.find(FileName) != string::npos))
+      std::string fdFileName = FileName;
+      
+      if (fdFileName.find("./") == 0 || fdFileName.find(".\\") == 0)
+      {
+        fdFileName = fdFileName.erase(0, 2);
+      }
+      else if (fdFileName.find("/") == 0 || fdFileName.find("\\") == 0)
+      {
+        fdFileName = fdFileName.erase(0, 1);
+      }
+      
+      if ((fdFile.size() > 0) && (fdFile.find(fdFileName) != string::npos))
       {
         ValueDecl *value = declExpr->getDecl();
         if (!isa<FunctionDecl>(value))
@@ -269,7 +279,7 @@ namespace chauffeur
 
           DI->getInstance().AddEntryPoint(declExpr->getNameInfo().getName().getAsString(), func_params);
         }
-
+        
         DI->getInstance().AddEntryPointPair(baseRecDecl->getNameAsString() + "$" + varDecl->getNameAsString(),
           funcname, declExpr->getNameInfo().getName().getAsString());
       }
